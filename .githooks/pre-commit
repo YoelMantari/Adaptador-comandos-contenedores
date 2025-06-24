@@ -1,0 +1,45 @@
+#!/usr/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+DOCKERFILES=$(git diff --staged --name-only | grep Dockerfile )
+
+if [[ -z $DOCKERFILES ]]; then
+    echo "No hay Dockerfiles por validar"
+    exit 0
+fi
+
+for dockerfile in ${DOCKERFILES[@]}; do
+
+    # Validacion de tag
+    if [[ -z $(grep -E '^FROM .+:(.{1,})$' $dockerfile) ]]; then
+        echo -e "${RED}No se cumple el patrón 'FROM <imagen>:<tag>'.${NC}"
+        exit 1
+    fi
+    
+    # Tag no puede ser latest
+    tag=$(grep -oP '^FROM .+:\K(.{1,})$' $dockerfile)
+    if [[ $tag == "latest" ]]; then
+        echo -e "${RED}Tag no puede ser latest.${NC}"
+        exit 1
+    fi
+
+    # Validacion del comando apt-get update
+    if [[ $(grep -cE '(apt-get|apt) update' $dockerfile) > 1 ]]; then
+        echo -e "${RED}Se debe usar el comando apt-update una sola vez.${NC}"
+        exit 1
+    fi
+
+    # Validar que la instruccion RUN este antes de la instruccion COPY (si existe)
+    ultima_linea_RUN=$(grep -n RUN $dockerfile | tail -n 1 | cut -d ':' -f 1)
+    primera_linea_COPY=$(grep -n COPY $dockerfile | head -n 1 | cut -d ':' -f 1)
+    if [[ ! $ultima_linea_RUN < $primera_linea_COPY ]]; then
+        echo -e "${RED}Linea de instrucción 'COPY': ${primera_linea_COPY} debe estar al final " \
+            "de linea de instrucción 'RUN': ${ultima_linea_RUN}.${NC}"
+        exit 1
+    fi
+done
+
+echo -e "${GREEN}Validaciones corectas en archivo(s) Dockerfile.${NC}"
