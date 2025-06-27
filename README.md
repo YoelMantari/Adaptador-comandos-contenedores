@@ -18,3 +18,24 @@ Para definir la carpeta que usara Git para lanzar los hooks:
 ```sh
 git config core.hooksPath .githooks
 ```
+
+### Paso 1
+
+Descagar la imagen de DockerHub
+
+```sh
+$ docker pull dirac22/simple-app:1.0.0
+```
+
+Ejecutar el contenedor:
+
+```sh
+$ docker run -it --name my-simple-app dirac22/simple-app:1.0.0
+```
+
+Estando ahora en "el terminal del contenedor"
+
+Ejecutar ping (como ejemplo)
+```sh
+/# ping -c 4 google.com
+```
