@@ -42,3 +42,23 @@ def seleccionar_contenedor(contenedores: list[str]) -> str:
     else:
         print("Índice inválido.")
         sys.exit(1)
+
+
+def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
+    """
+    Ejecuta comando arbitrario dentro del contenedor docker.
+    Se toma el id o nombre del contenedor del docker, y el comando
+    a ejecutar.
+    """
+    resultado = subprocess.run(
+        ["docker", "exec", contenedor_id] + comando,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    print("\nSalida estandar:")
+    print(resultado.stdout)
+    print("Errores:")
+    print(resultado.stderr)
+
+
