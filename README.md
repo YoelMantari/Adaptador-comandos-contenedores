@@ -39,3 +39,11 @@ Ejecutar ping (como ejemplo)
 ```sh
 /# ping -c 4 google.com
 ```
+
+### Paso 2
+Ejecutar el script:
+```sh
+python3 container_exec.py
+```
+Se mostrara un listado numerado de contenedores activos.
+Por ejemplo (ps, ps aux, ping, ls, ... etc)
