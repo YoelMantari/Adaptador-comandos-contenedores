@@ -62,3 +62,12 @@ def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
     print(resultado.stderr)
 
 
+def main():
+    contenedores = listar_contenedores()
+    contenedor_id = seleccionar_contenedor(contenedores)
+    comando = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
+    ejecutar_comando(contenedor_id, comando)
+
+
+if __name__ == "__main__":
+    main()
