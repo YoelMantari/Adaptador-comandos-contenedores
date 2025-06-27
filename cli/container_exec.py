@@ -24,3 +24,21 @@ def listar_contenedores() -> list[str]:
         print(f"{i + 1}. {cont}")
     return contenedores
 
+
+def seleccionar_contenedor(contenedores: list[str]) -> str:
+    """
+    Permite al usuario selecciona un contenedor por indice,
+    se lista los contenedores disponibles
+    retorna el id del contenedor seleccionado
+    """
+    try:
+        indice = int(input("\nSelecciona un contenedor (numero): ")) - 1
+    except ValueError:
+        print("Entrada invalida, debe ser un numero entero")
+        sys.exit(1)
+
+    if 0 <= indice < len(contenedores):
+        return contenedores[indice].split(":")[0]
+    else:
+        print("Índice inválido.")
+        sys.exit(1)
