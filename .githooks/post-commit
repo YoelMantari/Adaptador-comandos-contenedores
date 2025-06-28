@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+COMMIT_SHORT_HASH=$(git rev-parse --short HEAD)
+
+python3 genera_changelog.py $COMMIT_SHORT_HASH
+
+if [ $? -ne 0 ]; then
+    echo "Ocurrió un error al actualizar el CHANGELOG con el commit $COMMIT_SHORT_HASH"
+fi
+
+
