@@ -110,8 +110,15 @@ Probar un comando dentro del Pod
 ```sh
 kubectl exec -it simple-app-deployment-<identificador> -- ping -c 4 google.com
 ```
-
-
+### Paso 6
+Ejecutar en un pode de kubernetes en modo k8s
+```sh
+python3 cli/container_exec.py --platform k8s
+```
+Ejecutar en un contenedor Docker en modo docker
+```sh
+python3 cli/container_exec.py --platform docker
+```
 
 ## Sprint 1
 
@@ -158,7 +165,7 @@ Ejecutar ping (como ejemplo)
 ### Paso 2
 Ejecutar el script:
 ```sh
-python3 container_exec.py
+python3 cli/container_exec.py
 ```
 Se mostrara un listado numerado de contenedores activos.
 Por ejemplo (ps, ps aux, ping, ls, ... etc)
