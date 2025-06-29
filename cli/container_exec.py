@@ -91,7 +91,17 @@ def seleccionar_pod(pods: list[str]) -> str:
             idx = int(entrada) - 1
             if 0 <= idx < len(pods):
                 return pods[idx]
-        print(f"'{entrada}' no es un número valido. Intenta nuevamente.")
+        print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
+
+
+def ejecutar_comando_k8s(pod: str, comando: list[str]) -> None:
+    """
+    Ejecuta comando arbitrario dentro de un pod de Kubernetes.
+    usando flags para interactuar en bash
+    """
+    flags = ["-i", "-t"] if comando and comando[0] in ("bash", "sh") else []
+    cmd = ["kubectl", "exec"] + flags + [pod, "--"] + comando
+    subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 
 def main():
