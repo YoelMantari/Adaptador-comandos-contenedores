@@ -25,6 +25,24 @@ def listar_contenedores() -> list[str]:
     return contenedores
 
 
+def listar_pods() -> list[str]:
+    """
+    Lista pods en Kubernetes
+    """
+    resultado = subprocess.run(
+        ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"],
+        stdout=subprocess.PIPE, text=True, check=True
+    )
+    pods = resultado.stdout.strip().splitlines()[1:]  
+    if not pods:
+        print("No hay pods en el namespace actual.")
+        sys.exit(0)
+    print("\nPods Kubernetes activos:")
+    for i, pod in enumerate(pods, 1):
+        print(f"{i}. {pod}")
+    return pods
+
+
 def seleccionar_contenedor(contenedores: list[str]) -> str:
     """
     Permite al usuario selecciona un contenedor por indice,
