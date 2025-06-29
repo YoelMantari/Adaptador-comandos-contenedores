@@ -6,7 +6,7 @@ echo "Ejecutandose hook: commit-msg"
 MSG="$1"
 PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1,65}$'
 
-if [ ! grep -Eq "$PATTERN" "$MSG" ]; then
+if ! grep -Eq "$PATTERN" "$MSG"; then
     echo -e "${RED}Mensaje de commit invalido.${NC}"
     echo "Debe seguir patron: tipo(alcance): descripcion breve"
     exit 1
