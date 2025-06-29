@@ -80,6 +80,20 @@ def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
     print(resultado.stderr)
 
 
+def seleccionar_pod(pods: list[str]) -> str:
+    """
+    Solicita al usuario que seleccione un pod por número.
+    Devuelve el nombre del pod.
+    """
+    while True:
+        entrada = input("\nSelecciona un pod (numero): ").strip()
+        if entrada.isdigit():
+            idx = int(entrada) - 1
+            if 0 <= idx < len(pods):
+                return pods[idx]
+        print(f"'{entrada}' no es un número valido. Intenta nuevamente.")
+
+
 def main():
     contenedores = listar_contenedores()
     contenedor_id = seleccionar_contenedor(contenedores)
