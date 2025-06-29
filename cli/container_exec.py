@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import argparse
 
 
 def listar_contenedores() -> list[str]:
@@ -28,12 +29,13 @@ def listar_contenedores() -> list[str]:
 def listar_pods() -> list[str]:
     """
     Lista pods en Kubernetes
+    en ejecucion y los imprime
     """
     resultado = subprocess.run(
         ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"],
         stdout=subprocess.PIPE, text=True, check=True
     )
-    pods = resultado.stdout.strip().splitlines()[1:]  
+    pods = resultado.stdout.strip().splitlines()[1:]
     if not pods:
         print("No hay pods en el namespace actual.")
         sys.exit(0)
@@ -45,7 +47,7 @@ def listar_pods() -> list[str]:
 
 def seleccionar_contenedor(contenedores: list[str]) -> str:
     """
-    Solicita al usuario que ingrese un ID o nombre 
+    Solicita al usuario que ingrese un ID o nombre
     valido hasta que lo haga correctamente.
     Devuelve el ID del contenedor correspondiente.
     """
@@ -105,10 +107,27 @@ def ejecutar_comando_k8s(pod: str, comando: list[str]) -> None:
 
 
 def main():
-    contenedores = listar_contenedores()
-    contenedor_id = seleccionar_contenedor(contenedores)
-    comando = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
-    ejecutar_comando(contenedor_id, comando)
+    pars = argparse.ArgumentParser(
+        description="Ejecuta comandos en Docker o Kubernetes"
+    )
+    pars.add_argument(
+        "--platform", "-p",
+        choices=["docker", "k8s"],
+        default="docker",
+        help="Plataforma: docker (por defecto) o k8s"
+    )
+    args = pars.parse_args()
+
+    if args.platform == "docker":
+        conts = listar_contenedores()
+        cid = seleccionar_contenedor(conts)
+        cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
+        ejecutar_comando(cid, cmd)
+    else:
+        pods = listar_pods()
+        pod = seleccionar_pod(pods)
+        cmd = input("\nEscribe el comando a ejecutar dentro del pod: ").strip().split()
+        ejecutar_comando_k8s(pod, cmd)
 
 
 if __name__ == "__main__":
