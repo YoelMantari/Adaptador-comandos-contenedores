@@ -20,8 +20,6 @@
   - Actualiza CHANGELOG para inicio de Sprint 2
   - Agrega script `genera_changelog.py` para automatizar actualizar el CHANGELOG
 
-- **Dirac**: Agrega manifiesto deployment.yaml
-
-Agrega manifiesto para despliegue enb Kubernetes
-Se modifca el archivo Dockerfile para poder hacer
-el despliegue. Commit: `e38eddb`
+- **Dirac**: Agrega manifiesto deployment.yaml. Commit: `e38eddb`
+  - Agrega manifiesto para despliegue enb Kubernetes
+  - Se modifca el archivo Dockerfile para poder hacer el despliegue. 
