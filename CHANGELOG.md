@@ -14,10 +14,14 @@
 
 
 - **Dirac**: Agrega post-commit y actualiza commit-msg. Commit: `34069b4`
-
-
-- **Dirac**: Arregla commit-msg. Commit: `bf06296`
-
-- **Dirac**: Arregla commit-msg. Commit: `d7afe5d`
-
 - **Dirac**: Primera actualizacion Sprint 2. Commit: `55a6ef0`
+- **Dirac**: Actualiza para inicio de Sprint 2. Commit: `154ee13`
+  - Actualiza README para inicio de Sprint 2
+  - Actualiza CHANGELOG para inicio de Sprint 2
+  - Agrega script `genera_changelog.py` para automatizar actualizar el CHANGELOG
+
+- **Dirac**: Agrega manifiesto deployment.yaml
+
+Agrega manifiesto para despliegue enb Kubernetes
+Se modifca el archivo Dockerfile para poder hacer
+el despliegue. Commit: `e38eddb`
