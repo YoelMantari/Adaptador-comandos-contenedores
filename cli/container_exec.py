@@ -45,21 +45,21 @@ def listar_pods() -> list[str]:
 
 def seleccionar_contenedor(contenedores: list[str]) -> str:
     """
-    Permite al usuario selecciona un contenedor por indice,
-    se lista los contenedores disponibles
-    retorna el id del contenedor seleccionado
+    Solicita al usuario que ingrese un ID o nombre 
+    valido hasta que lo haga correctamente.
+    Devuelve el ID del contenedor correspondiente.
     """
-    try:
-        indice = int(input("\nSelecciona un contenedor (numero): ")) - 1
-    except ValueError:
-        print("Entrada invalida, debe ser un numero entero")
-        sys.exit(1)
-
-    if 0 <= indice < len(contenedores):
-        return contenedores[indice].split(":")[0]
-    else:
-        print("Índice inválido.")
-        sys.exit(1)
+    while True:
+        entrada = input("\nSelecciona un contenedor (ID o nombre): ").strip()
+        for cont in contenedores:
+            try:
+                cid, resto = cont.split(":", 1)
+                nombre = resto.split(" - ")[1].strip()
+                if entrada == cid or entrada == nombre:
+                    return cid
+            except (IndexError, ValueError):
+                continue  # ignorar formatos inesperados
+        print(f"'{entrada}' no coincide con ningun ID o nombre listado, intentarlo de nuevo")
 
 
 def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
