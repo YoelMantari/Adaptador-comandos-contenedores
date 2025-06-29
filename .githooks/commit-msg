@@ -1,13 +1,13 @@
 #!/usr/bin/bash
 
-RED='\033[0;31'
+RED='\033[0;31m'
 NC='\033[0m'
 echo "Ejecutandose hook: commit-msg"
 MSG="$1"
 PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1,65}$'
 
-if [ ! grep -Eq "$PATTERN" "$MSG" ]; then
-    echo "${RED}Mensaje de commit invalido.${NC}"
+if ! grep -Eq "$PATTERN" "$MSG"; then
+    echo -e "${RED}Mensaje de commit invalido.${NC}"
     echo "Debe seguir patron: tipo(alcance): descripcion breve"
     exit 1
 fi

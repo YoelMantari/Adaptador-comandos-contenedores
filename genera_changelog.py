@@ -22,7 +22,7 @@ def get_commit_info(commit_hash):
 
 def update_changelog(changelog_file, author, message, commit_hash):
     with open(changelog_file, 'a', encoding='utf-8') as f:
-        f.write(f"- **{author}**: {message}. Commit: `{commit_hash}`\n")
+        f.write(f"\n- **{author}**: {message}. Commit: `{commit_hash}`\n")
 
 
 if __name__ == "__main__":
