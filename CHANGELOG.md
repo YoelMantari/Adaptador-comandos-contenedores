@@ -23,3 +23,12 @@
 - **Dirac**: Agrega manifiesto deployment.yaml. Commit: `e38eddb`
   - Agrega manifiesto para despliegue enb Kubernetes
   - Se modifca el archivo Dockerfile para poder hacer el despliegue. 
+
+- **Dirac**: Archivos iniciales para pruebas unitarias. Commit: `cdb4bbb`
+  - Se agrego archivos `__init__.py` en carpeta `cli` y `tests`. Se agrego archivo ``requeriments.txt.` 
+
+
+- **Dirac**: Agrega primer archivo de prueba
+
+Ejecuta pruebas para metodos listar_contenedores y
+seleccionar_contenedor. Commit: `a2b2cf6`

@@ -14,3 +14,6 @@ validaciones-dockerfile
 # Otros
 
 historial-comandos.*
+
+# __pycache__/
+**/__pycache__/
