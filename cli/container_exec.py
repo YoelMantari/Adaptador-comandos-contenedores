@@ -99,8 +99,6 @@ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) ->
     subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 
-# --- Seleccionar recurso
-
 def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
     """
     Mostarmos una lista numerada de recursos (contenedores en docker o pods en kubernetes).
@@ -122,9 +120,6 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
         except ValueError:
             print("Entrada inválida. Introduce un número") 
 
-# ----------------------------------------------------------------------------------------
-
-# --- Logica de manejo
 
 def manejar_docker(aliases: dict):
     """

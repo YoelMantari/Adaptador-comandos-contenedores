@@ -1,0 +1,4 @@
+- Especifica la versión de la imagen base. 
+- Evitar FROM <imagen>:latest
+- El comando `apt-get update` se debe usar una sola vez para instalar las dependencias necesarias
+- La instrucción `COPY` debe estar después de la o las instrucciones `RUN`
