@@ -1,6 +1,19 @@
 import subprocess
 import sys
 import argparse
+import configparser
+
+
+def cargar_aliases(config_file="config.ini") -> dict:
+    """
+    Carga los alias desde un archivo de configuracion .ini.
+    Devuelve un diccionario con los alias.
+    """
+    config = configparser.ConfigParser()
+    if not config.read(config_file):
+        return {}
+
+    return dict(config.items('aliases'))
 
 
 def listar_contenedores() -> list[str]:
@@ -41,25 +54,6 @@ def listar_pods(namespace: str | None) -> list[str]:
     return pods
 
 
-def seleccionar_contenedor(contenedores: list[str]) -> str:
-    """
-    Solicita al usuario que ingrese un ID o nombre
-    valido hasta que lo haga correctamente.
-    Devuelve el ID del contenedor correspondiente.
-    """
-    while True:
-        entrada = input("\nSelecciona un contenedor (ID o nombre): ").strip()
-        for cont in contenedores:
-            try:
-                cid, resto = cont.split(":", 1)
-                nombre = resto.split(" - ")[1].strip()
-                if entrada == cid or entrada == nombre:
-                    return cid
-            except (IndexError, ValueError):
-                continue  # ignorar formatos inesperados
-        print(f"'{entrada}' no coincide con ningun ID o nombre listado, intentarlo de nuevo")
-
-
 def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
     """
     Ejecuta comando arbitrario dentro del contenedor docker.
@@ -76,20 +70,6 @@ def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
     print(resultado.stdout)
     print("Errores:")
     print(resultado.stderr)
-
-
-def seleccionar_pod(pods: list[str]) -> str:
-    """
-    Solicita al usuario que seleccione un pod por número.
-    Devuelve el nombre del pod.
-    """
-    while True:
-        entrada = input("\nSelecciona un pod (numero): ").strip()
-        if entrada.isdigit():
-            idx = int(entrada) - 1
-            if 0 <= idx < len(pods):
-                return pods[idx]
-        print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
 
 
 def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) -> None:
