@@ -120,25 +120,29 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
                 print(f"{recursos[indice]}")
                 return recursos[indice] # Para pods
         except ValueError:
-            print("Entrada inválida. Introduce un número")    
+            print("Entrada inválida. Introduce un número") 
 
 # ----------------------------------------------------------------------------------------
 
 # --- Logica de manejo
 
-def manejar_docker():
+def manejar_docker(aliases: dict):
     """
-    Para manejar ejecucion de comandos en Docker
+    Para manejar ejecucion de comandos en Docker.
+    Soporte para alias
     """
     recursos = listar_contenedores()
     if not recursos:
         return # Termina ejecución si no hay recursos
     recurso_id = seleccionar_recurso(recursos, "contenedor")
-    comando_str = input(f"\nComando a ejecutar en el contenedor {recurso_id}: ").strip()
+    comando_str = input(f"\nComando o alias a ejecutar en el contenedor {recurso_id}: ").strip()
     if not comando_str:
         print("No se ingreso ningun comando")
         return
-    ejecutar_comando_docker(recurso_id, comando_str.split())
+    comando_final_str = aliases.get(comando_str, comando_str)
+    if comando_final_str != comando_str:
+        print(f"Ejecutando alias: '{comando_str}': '{comando_final_str}'\n")
+    ejecutar_comando_docker(recurso_id, comando_final_str.split())
 
 
 def manejar_kubernetes(namespace: str | None):
