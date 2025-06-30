@@ -8,9 +8,6 @@ PC4.md
 # Recursos que se usaron en el proyecto
 recursos
 
-# Reglas minimas para archivos Dockerfile
-validaciones-dockerfile
-
 # Otros
 
 historial-comandos.*
@@ -19,3 +16,7 @@ historial-comandos.*
 **/__pycache__/
 
 .coverage
+
+config.ini
+
+test_e2e.sh
