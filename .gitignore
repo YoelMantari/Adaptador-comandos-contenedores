@@ -18,5 +18,3 @@ historial-comandos.*
 .coverage
 
 config.ini
-
-test_e2e.sh
