@@ -1,6 +1,19 @@
 import subprocess
 import sys
 import argparse
+import configparser
+
+
+def cargar_aliases(config_file="config.ini") -> dict:
+    """
+    Carga los alias desde un archivo de configuracion .ini.
+    Devuelve un diccionario con los alias.
+    """
+    config = configparser.ConfigParser()
+    if not config.read(config_file):
+        return {}
+
+    return dict(config.items('aliases'))
 
 
 def listar_contenedores() -> list[str]:
@@ -39,25 +52,6 @@ def listar_pods(namespace: str | None) -> list[str]:
     # for i, pod in enumerate(pods, 1):
     #     print(f"{i}. {pod}")
     return pods
-
-
-def seleccionar_contenedor(contenedores: list[str]) -> str:
-    """
-    Solicita al usuario que ingrese un ID o nombre
-    valido hasta que lo haga correctamente.
-    Devuelve el ID del contenedor correspondiente.
-    """
-    while True:
-        entrada = input("\nSelecciona un contenedor (ID o nombre): ").strip()
-        for cont in contenedores:
-            try:
-                cid, resto = cont.split(":", 1)
-                nombre = resto.split(" - ")[1].strip()
-                if entrada == cid or entrada == nombre:
-                    return cid
-            except (IndexError, ValueError):
-                continue  # ignorar formatos inesperados
-        print(f"'{entrada}' no coincide con ningun ID o nombre listado, intentarlo de nuevo")
 
 
 def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
@@ -124,37 +118,46 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
                 print(f"{recursos[indice]}")
                 return recursos[indice] # Para pods
         except ValueError:
-            print("Entrada inválida. Introduce un número")    
+            print("Entrada inválida. Introduce un número") 
 
 
-def manejar_docker():
+def manejar_docker(aliases: dict):
     """
-    Para manejar ejecucion de comandos en Docker
+    Para manejar ejecucion de comandos en Docker.
+    Soporte para alias
     """
     recursos = listar_contenedores()
     if not recursos:
         return # Termina ejecución si no hay recursos
     recurso_id = seleccionar_recurso(recursos, "contenedor")
-    comando_str = input(f"\nComando a ejecutar en el contenedor {recurso_id}: ").strip()
+    comando_str = input(f"\nComando o alias a ejecutar en el contenedor {recurso_id}: ").strip()
     if not comando_str:
         print("No se ingreso ningun comando")
         return
-    ejecutar_comando_docker(recurso_id, comando_str.split())
+    comando_final_str = aliases.get(comando_str, comando_str)
+    if comando_final_str != comando_str:
+        print(f"Ejecutando alias: '{comando_str}': '{comando_final_str}'\n")
+    ejecutar_comando_docker(recurso_id, comando_final_str.split())
 
 
-def manejar_kubernetes(namespace: str | None):
+def manejar_kubernetes(namespace: str | None, aliases: dict):
     """
-    Para manejar ejecucion de comandos en Kubernetes
+    Para manejar ejecucion de comandos en Kubernetes.
+    Soporte para alias
     """
     recursos = listar_pods(namespace)
     if not recursos:
         return
     recurso = seleccionar_recurso(recursos, "pod")
-    comando_str = input(f"\nComando a ejecutar en el pod {recurso}: ")
+    comando_str = input(f"\nComando o alias a ejecutar en el pod {recurso}: ")
     if not comando_str:
         print("No se ingreso ningun comando")
         return
-    ejecutar_comando_k8s(recurso, namespace, comando_str.split())
+    comando_final_str = aliases.get(comando_str, comando_str)
+    if comando_final_str != comando_str:
+        print(f"Ejecutando alias: '{comando_str}': '{comando_final_str}'\n")
+    ejecutar_comando_k8s(recurso, namespace, comando_final_str.split())
+
 
 def main():
     """
@@ -177,14 +180,16 @@ def main():
 
     args = pars.parse_args()
 
+    aliases = cargar_aliases()
+
     if args.platform == "docker":
         # conts = listar_contenedores()
         # cid = seleccionar_contenedor(conts)
         # cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
         # ejecutar_comando_docker(cid, cmd)
-        manejar_docker()
+        manejar_docker(aliases)
     elif args.platform == "k8s":
-        manejar_kubernetes(args.namespace)
+        manejar_kubernetes(args.namespace, aliases)
     # else:
     #     pods = listar_pods(args.na)
     #     pod = seleccionar_pod(pods)
