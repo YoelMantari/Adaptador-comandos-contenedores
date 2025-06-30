@@ -1,14 +1,20 @@
 # Entorno virtual
 
 .venv
-
+.env
 # PC4
 PC4.md
 
 # Recursos que se usaron en el proyecto
 recursos
 
-# Reglas minimas para archivos Dockerfile
-validaciones-dockerfile
-
 # Otros
+
+historial-comandos.*
+
+# __pycache__/
+**/__pycache__/
+
+.coverage
+
+config.ini
