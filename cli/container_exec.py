@@ -185,14 +185,16 @@ def main():
 
     args = pars.parse_args()
 
+    aliases = cargar_aliases()
+
     if args.platform == "docker":
         # conts = listar_contenedores()
         # cid = seleccionar_contenedor(conts)
         # cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
         # ejecutar_comando_docker(cid, cmd)
-        manejar_docker()
+        manejar_docker(aliases)
     elif args.platform == "k8s":
-        manejar_kubernetes(args.namespace)
+        manejar_kubernetes(args.namespace, aliases)
     # else:
     #     pods = listar_pods(args.na)
     #     pod = seleccionar_pod(pods)
