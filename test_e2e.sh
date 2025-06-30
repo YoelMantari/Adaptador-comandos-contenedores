@@ -54,7 +54,7 @@ run_test "Alias 'ping_google' en Docker" \
          || failures=$((failures+1))
 
 run_test "Alias 'list_root' en Kubernetes" \
-         "echo -e '1\nlist_root' | python3 cli/container_exec.py -p k8s -n desarrollo" \
+         "echo -e '1\nlist_root' | python3 cli/container_exec.py -p k8s" \
          "etc" \
          || failures=$((failures+1))
 
@@ -64,7 +64,7 @@ run_test "Comando directo 'echo' en Docker" \
          || failures=$((failures+1))
          
 run_test "Comando directo 'echo' en Kubernetes" \
-         "echo -e '1\necho HELLO K8S' | python3 cli/container_exec.py -p k8s -n desarrollo" \
+         "echo -e '1\necho HELLO K8S' | python3 cli/container_exec.py -p k8s" \
          "HELLO K8S" \
          || failures=$((failures+1))
 
@@ -75,12 +75,11 @@ echo "Iniciando fase de teardown (Limpieza de contenedores y pods)"
 echo "Limpiando recursos de prueba..."
 docker rm -f $DOCKER_CONTAINER_NAME
 kubectl delete deployment $K8S_DEPLOYMENT_NAME
-echo "--- Limpieza Completa ---"
+echo "Limpieza Completa"
 echo ""
 
-# --- 4. REPORTE FINAL ---
 if [ $failures -eq 0 ]; then
-    echo -e "${GREEN}¡Todas las pruebas E2E pasaron exitosamente!${NC}"
+    echo -e "${GREEN}Todas las pruebas E2E pasaron exitosamente${NC}"
     exit 0
 else
     echo -e "${RED}$failures prueba(s) E2E fallaron.${NC}"

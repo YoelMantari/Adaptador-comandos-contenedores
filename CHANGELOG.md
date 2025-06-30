@@ -36,6 +36,7 @@
 - **YoelMantari**: listar pods de kubernetes desde la cli. Commit: `2fd72dd`
   - se añade la funcion listar_pods(), que imprime en forma enumerada los pods.
 
+<<<<<<< Updated upstream
 - **YoelMantari**: mejorar seleccion de contenedor por id o nombre. Commit: `c27325a`
   - se actualiza la funcion seleccionar_contenedor() para que se ingresar el id o nombre del contenedor en lugar de indice.
 
@@ -50,4 +51,22 @@
 
 
 
-- **Dirac**: Actualiza script para Sprint 2. Commit: `c98a4b5`
+## Dia 5
+
+- **YoelMantari**: se agrega soporte para carga de alias desde config.ini. Commit: `518c082`
+  - se implementa la funcion cargar_aliases() que permite leer alias definidos en un archivo ini. Commit: `feae786`
+
+- **YoelMantari**: se agrega soporte para carga de alias desde config.ini. Commit: `02ca192`
+
+- **YoelMantari**: permitir seleccion interactiva de pod por numero. Se agrega la funcion seleccionar_pod que solicita al usuario elegir un pod de una lista numerada. Commit: `f3d0fb9`
+
+- **YoelMantari**: ejecutar comandos en docker con soporte para alias. Commit: `0adf775`
+
+- **YoelMantari**: agregar soporte de alias en manejo de pods Kubernetes. Commit: `14f039d`
+
+- **YoelMantari**: integrar soporte de alias en funcion principal. Se modifica main() para cargar alias desde config.ini y pasarlos a las funciones de ejecucion.. Commit: `641ea92`
+
+- **YoelMantari**: agregar archivo confi.ini con alias de comandos. Commit: `511bb40`
+
+
+- **Dirac**: Se agrega script para ejecutar prueba E2E. Commit: `d4b49da`
