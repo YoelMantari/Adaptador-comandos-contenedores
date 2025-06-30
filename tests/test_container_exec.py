@@ -17,7 +17,6 @@ def test_listar_contenedores_existentes(mocker):
     resultado_mock = Mock()
     resultado_mock.stdout = texto_simulado
     mock_run = mocker.patch("cli.container_exec.subprocess.run", return_value=resultado_mock)
-    mock_print = mocker.patch("builtins.print")
 
     # Act
     contenedores = listar_contenedores()
@@ -38,7 +37,6 @@ def test_listar_contenedores_no_hay(mocker):
     resultado_mock = Mock()
     resultado_mock.stdout = ""
     mocker.patch("cli.container_exec.subprocess.run", return_value=resultado_mock)
-    mocker.patch("builtins.print")
 
     # Act
     with pytest.raises(SystemExit) as e:
@@ -92,7 +90,7 @@ def test_ejecutar_comando_docker(mocker, comando):
 
     # Act
     ejecutar_comando_docker(id_contenedor, comando)
-    comando_esperado = ["docker", "exec"] + [id_contenedor] + comando
+    # comando_esperado = ["docker", "exec"] + [id_contenedor] + comando
     
     # Assert
     mock_run.assert_called_once_with(
