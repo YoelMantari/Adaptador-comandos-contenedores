@@ -5,7 +5,9 @@
 ```text
 ├── CHANGELOG.md
 ├── cli
-│   └── container_exec.py
+│   ├── container_exec.py
+│   └── __init__.py
+├── config.ini
 ├── deployment.yaml
 ├── genera_changelog.py
 ├── .githooks
@@ -17,17 +19,34 @@
 │       └── historia-de-usuario.md
 ├── .gitignore
 ├── README.md
+├── requirements.txt
 ├── simple-app
 │   └── Dockerfile
+├── tests
+│   ├── __init__.py
+│   └── test_container_exec.py
+├── validaciones-dockerfile
 └── videos
-    └── Sprint-1.mp4
+    ├── Sprint-1.mp4
+    └── Sprint-2.mp4
+
 ```
 
 
-## Sprint 2
-
 ### Paso 0
-Instalar Kubernetes y Minikube
+
+Para definir la carpeta que usara Git para lanzar los hooks:
+
+```sh
+$ git config core.hooksPath .githooks
+```
+
+Dar los permisos necesarios
+```sh
+$ chmod +x .githooks/commit-msg .githooks/post-commit .githooks/pre-commit
+```
+
+Instalar Docker, Kubernetes y Minikube
 
 ### Paso 1
 
@@ -56,15 +75,13 @@ Siempre asegurarse que Minikube este corriendo
 ```sh
 $ minikube status
 
-# Debe salir:
+# Debe salir algo similar a:
 host: Running
 kubelet: Running
 apiserver: Running
 ```
 
-Sino hay varias opciones:
-
-Iniciar nuevamente Minikube:
+Puedes tambien iniciar nuevamente Minikube:
 
 ```sh
 $ minikube start
@@ -80,6 +97,18 @@ $ minikube start --kubernetes-version=v1.33.1
 Asegurate que Minikube este corriendo exitosamente.
 
 ### Paso 3
+
+Crear namespace
+
+```sh
+$ kubectl create namespace desarrollo
+```
+
+Validar namespaces
+
+```sh
+$ kubectl get namespaces
+```
 
 Aplicar el manifiesto
 
@@ -119,6 +148,10 @@ Ejecutar en un contenedor Docker en modo docker
 ```sh
 python3 cli/container_exec.py --platform docker
 ```
+Ejecutar en un pode de kubernetes en modo k8s y definiendo el namespace
+```sh
+python3 cli/container_exec.py --platform k8s --namespace desarrollo
+```
 
 ### Paso 7
 
@@ -127,53 +160,3 @@ Ejecutar pruebas unitarias
 ```sh
 pytest -v
 ```
-
-## Sprint 1
-
-### Estructura
-
-```text
-├── CHANGELOG.md
-├── genera_changelog.py
-├── README.md
-└── simple-app
-    └── Dockerfile
-```
-
-
-### Paso 0
-
-Para definir la carpeta que usara Git para lanzar los hooks:
-
-```sh
-git config core.hooksPath .githooks
-```
-
-### Paso 1
-
-Descagar la imagen de DockerHub
-
-```sh
-$ docker pull dirac22/simple-app:1.0.0
-```
-
-Ejecutar el contenedor:
-
-```sh
-$ docker run -it --name my-simple-app dirac22/simple-app:1.0.0
-```
-
-Estando ahora en "el terminal del contenedor"
-
-Ejecutar ping (como ejemplo)
-```sh
-/# ping -c 4 google.com
-```
-
-### Paso 2
-Ejecutar el script:
-```sh
-python3 cli/container_exec.py
-```
-Se mostrara un listado numerado de contenedores activos.
-Por ejemplo (ps, ps aux, ping, ls, ... etc)
