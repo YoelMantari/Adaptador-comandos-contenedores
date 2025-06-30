@@ -145,19 +145,24 @@ def manejar_docker(aliases: dict):
     ejecutar_comando_docker(recurso_id, comando_final_str.split())
 
 
-def manejar_kubernetes(namespace: str | None):
+def manejar_kubernetes(namespace: str | None, aliases: dict):
     """
-    Para manejar ejecucion de comandos en Kubernetes
+    Para manejar ejecucion de comandos en Kubernetes.
+    Soporte para alias
     """
     recursos = listar_pods(namespace)
     if not recursos:
         return
     recurso = seleccionar_recurso(recursos, "pod")
-    comando_str = input(f"\nComando a ejecutar en el pod {recurso}: ")
+    comando_str = input(f"\nComando o alias a ejecutar en el pod {recurso}: ")
     if not comando_str:
         print("No se ingreso ningun comando")
         return
-    ejecutar_comando_k8s(recurso, namespace, comando_str.split())
+    comando_final_str = aliases.get(comando_str, comando_str)
+    if comando_final_str != comando_str:
+        print(f"Ejecutando alias: '{comando_str}': '{comando_final_str}'\n")
+    ejecutar_comando_k8s(recurso, namespace, comando_final_str.split())
+
 
 def main():
     """
