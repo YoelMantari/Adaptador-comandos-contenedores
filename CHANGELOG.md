@@ -50,3 +50,4 @@
 
 
 
+- **Dirac**: Actualiza script para Sprint 2. Commit: `c98a4b5`

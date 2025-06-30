@@ -84,7 +84,7 @@ Asegurate que Minikube este corriendo exitosamente.
 Aplicar el manifiesto
 
 ```sh
-$ kubectl appy -f deployment.yaml
+$ kubectl apply -f deployment.yaml
 ```
 
 ### Paso 4
@@ -118,6 +118,14 @@ python3 cli/container_exec.py --platform k8s
 Ejecutar en un contenedor Docker en modo docker
 ```sh
 python3 cli/container_exec.py --platform docker
+```
+
+### Paso 7
+
+Ejecutar pruebas unitarias
+
+```sh
+pytest -v
 ```
 
 ## Sprint 1

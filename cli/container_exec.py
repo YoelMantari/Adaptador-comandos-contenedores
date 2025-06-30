@@ -121,7 +121,9 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
             indice = int(input(f"Selecciona un {tipo_recurso} por número: ")) - 1
             if 0 <= indice < len(recursos):
                 if tipo_recurso == "contenedor":
+                    print(f"salida: {recursos[indice].split(":")[0]}")
                     return recursos[indice].split(":")[0] # Para contenedores
+                print(f"{recursos[indice]}")
                 return recursos[indice] # Para pods
         except ValueError:
             print("Entrada inválida. Introduce un número")    
