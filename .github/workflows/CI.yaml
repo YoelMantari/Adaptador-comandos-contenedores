@@ -1,4 +1,4 @@
-name: Adaptador
+name: CI
 
 # se ejecuta cuando se hace cada push a develop o feature
 on:
@@ -6,9 +6,9 @@ on:
     branches:
       - develop
       - feature/*
-    pull_request:
-      branches:
-        - develop
+  pull_request:
+    branches:
+      - develop
  
 jobs:
   build:
@@ -18,18 +18,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # detectar duplicación con jscpd
+      - name: Instalar Node.js y jscpd
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Ejecutar jscpd
+        run: |
+          npm install -g jscpd
+          jscpd --threshold 30 . || exit 1
+
+      # ejecutar pytest
+      - name: Configurar Python y dependencias
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Instalar requisitos y pytest
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt pytest pytest-mock
+      - name: Ejecutar pruebas
+        run: pytest --maxfail=1 --disable-warnings -q
+
+      # lint de scripts 
+      - name: Instalar shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Lintear scripts .sh
+        run: find . -name '*.sh' -print0 | xargs -0 shellcheck
+
+      # descarga y validar manifiestos k8s
+      - name: Instalar kubeconform
+        run: |
+          curl -sSL -o kubeconform.tar.gz \
+            https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar -zxvf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+      - name: Validar manifiesto K8s
+        run: kubeconform -strict -summary deployment.yaml
+
       # construiccion de la imagen
       - name: construir imagen docker
-        run: |
-            docker build -t adaptador-ci:latest ./simple-app
-
-      # instalacion de kubctl
-      - name: kubernetes manifesto
-        uses: actions/setup-kubectl@v3
-        with:
-          version: 'latest'
-
-      - name: desplegar kubectl
-        run: |
-            kubectl apply --dry-run=client -f deployment.yaml
- 
+        run: docker build -t adaptador-ci:latest ./simple-app
