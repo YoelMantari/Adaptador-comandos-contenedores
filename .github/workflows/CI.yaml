@@ -1,0 +1,26 @@
+name: Adaptador
+
+# se ejecuta cuando se hace cada push a develop o feature
+on:
+  push:
+    branches:
+      - develop
+      - feature/*
+    pull_request:
+      branches:
+        - develop
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: construir imagen docker
+        run: |
+            docker build -t adaptador-ci:latest .
+      - name: kubernetes manifesto
+        run: |
+            kubectl apply --dry-run=client -f deployment.yaml
