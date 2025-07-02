@@ -24,3 +24,4 @@ jobs:
       - name: kubernetes manifesto
         run: |
             kubectl apply --dry-run=client -f deployment.yaml
+ 
