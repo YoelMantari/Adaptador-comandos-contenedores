@@ -20,7 +20,7 @@ jobs:
 
       - name: construir imagen docker
         run: |
-            docker build -t adaptador-ci:latest .
+            docker build -t adaptador-ci:latest ./simple-app
       - name: kubernetes manifesto
         run: |
             kubectl apply --dry-run=client -f deployment.yaml
