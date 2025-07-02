@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: buscara cadenas asociadas a AI
         run: |
-          grep -RIE --exclude-dir=.git \
+          grep -RIE --exclude-dir=.git --exclude-dir=.github/workflows \
             -e "chatgpt" -e "bard" -e "llama" -e "as an ai" \
             -e "🧩" -e "🧠" -e "✅" -e "🧪" . && exit 1 || exit 0
 
