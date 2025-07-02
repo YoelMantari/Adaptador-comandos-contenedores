@@ -18,10 +18,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # construiccion de la imagen
       - name: construir imagen docker
         run: |
             docker build -t adaptador-ci:latest ./simple-app
+
+      # instalacion de kubctl
       - name: kubernetes manifesto
+        uses: actions/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: desplegar kubectl
         run: |
             kubectl apply --dry-run=client -f deployment.yaml
  
