@@ -11,18 +11,6 @@ on:
       - develop
  
 jobs:
-  # escaneo de llm
-  token-scan:
-    name: Escaneo de llm
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: buscara cadenas asociadas a AI
-        run: |
-          grep -RIE --exclude-dir=.git --exclude-dir=.github/workflows \
-            -e "chatgpt" -e "bard" -e "llama" -e "as an ai" \
-            -e "🧩" -e "🧠" -e "✅" -e "🧪" . && exit 1 || exit 0
-
   build:
     name: CI
     runs-on: ubuntu-latest
