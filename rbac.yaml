@@ -1,0 +1,32 @@
+# se define una cuenta llamada 'exec-user'
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: exec-user
+  namespace: default
+---
+# se define un rol llamado 'exec-role'
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: exec-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/exec"]
+  verbs: ["get", "list", "create", "delete", "patch"]
+---
+# se vincula la cuenta de servicio 'exec-user' con el rol 'exec-role'
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: exec-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: exec-user
+  namespace: default
+roleRef:
+  kind: Role
+  name: exec-role
+  apiGroup: rbac.authorization.k8s.io
