@@ -2,7 +2,12 @@ import subprocess
 import sys
 import argparse
 import configparser
+import logging
+from pathlib import Path
 
+log_path = Path('logs-centralizado.log')
+
+logging.basicConfig(filename=log_path, encoding='utf-8', level=logging.DEBUG)
 
 def cargar_aliases(config_file="config.ini") -> dict:
     """
@@ -28,6 +33,11 @@ def listar_contenedores() -> list[str]:
     if not contenedores or contenedores == ['']:
         print("No hay contenedores en ejecucion.")
         sys.exit(0)
+    logging.info("Listnado contenedores")
+    if resultado.stdout:
+        logging.debug(f"Salida:\n{resultado.stdout}")
+    if resultado.stderr:
+        logging.error(f"Salida:\n{resultado.stderr}")
     return contenedores
     # print("\nContenedores activos:")
     # for i, cont in enumerate(contenedores):
@@ -43,11 +53,19 @@ def listar_pods(namespace: str | None) -> list[str]:
     comando = ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"]
     if namespace:
         comando.extend(["-n", namespace])
-    resultado = subprocess.run(comando, stdout=subprocess.PIPE, text=True, check=True)
+    resultado = subprocess.run(comando, 
+                               stdout=subprocess.PIPE, 
+                               stderr=subprocess.PIPE, 
+                               text=True, check=True)
     pods = resultado.stdout.strip().splitlines()[1:]
     if not pods:
         print("No hay pods en el namespace actual.")
         sys.exit(0)
+    logging.info("Listnado pods")
+    if resultado.stdout:
+        logging.debug(f"Salida:\n{resultado.stdout}")
+    if resultado.stderr:
+        logging.error(f"Salida:\n{resultado.stderr}")
     # print("\nPods Kubernetes activos:")
     # for i, pod in enumerate(pods, 1):
     #     print(f"{i}. {pod}")
@@ -70,6 +88,11 @@ def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
     print(resultado.stdout)
     print("Errores:")
     print(resultado.stderr)
+    logging.info("Ejecutando comando dentro de Contendor")
+    if resultado.stdout:
+        logging.debug(f"Salida:\n{resultado.stdout}")
+    if resultado.stderr:
+        logging.error(f"Error:\n{resultado.stderr}")
 
 
 def seleccionar_pod(pods: list[str]) -> str:
@@ -84,6 +107,7 @@ def seleccionar_pod(pods: list[str]) -> str:
             if 0 <= idx < len(pods):
                 return pods[idx]
         print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
+    
 
 
 def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) -> None:
@@ -96,7 +120,17 @@ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) ->
         cmd_base.extend(["-n", namespace])
     flags = ["-i", "-t"] if comando and comando[0] in ("bash", "sh") else []
     cmd = cmd_base + flags + [pod, "--"] + comando
-    subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+    resultado = subprocess.run(
+        cmd, 
+        stdin=sys.stdin, 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE,
+        text=True)
+    logging.info("Ejecutando comando dentro de pod")
+    if resultado.stdout:
+        logging.debug(f"Salida:\n{resultado.stdout}")
+    if resultado.stderr:
+        logging.error(f"Error:\n{resultado.stderr}")
 
 
 def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:

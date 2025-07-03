@@ -59,7 +59,7 @@ def test_listar_pods_con_namespace(mocker):
 
     # Assert
     comando_str = ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name", "-n", namespace_simulado]
-    mock_run.assert_called_once_with(comando_str, stdout=subprocess.PIPE, text=True, check=True)
+    mock_run.assert_called_once_with(comando_str, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
     assert pods == ["pod-1", "pod-2"]
 
 
@@ -134,6 +134,6 @@ def test_ejecutar_comando_k8s(mocker, comando, namespace, espera_flags):
     mock_run.assert_called_once_with(
         cmd_esperado,
         stdin=sys.stdin,
-        stdout=sys.stdout,
-        stderr=sys.stderr
-    )
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE,
+        text=True)
