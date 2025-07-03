@@ -1,0 +1,4274 @@
+commit 515915dc8baa62fd21bd8018ac799d277ce4b75c
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Sat Jun 21 22:34:44 2025 -0500
+
+    Initial commit
+---
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..412c0a3
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# Adaptador--comandos-contenedores
+\ No newline at end of file
+
+commit f658dc0f5a1e7cf1edca13a9453d9353bba0b42a
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Sat Jun 21 23:08:53 2025 -0500
+
+    feat(templates): agregar plantilla para historias de usuario
+---
+ .github/ISSUE_TEMPLATE/historia-de-usuario.md | 33 +++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/.github/ISSUE_TEMPLATE/historia-de-usuario.md b/.github/ISSUE_TEMPLATE/historia-de-usuario.md
+new file mode 100644
+index 0000000..515f850
+--- /dev/null
++++ b/.github/ISSUE_TEMPLATE/historia-de-usuario.md
+@@ -0,0 +1,33 @@
++---
++name: Historia de usuario
++about: Plantilla para definir historias de usuario en el proyecto GitOps Local.
++title: ''
++labels: ''
++assignees: ''
++
++---
++
++## Historia de usuario
++
++**Como** _(rol específico, por ejemplo: desarrollador, integrante del equipo, administrador)_  
++**Necesito** _(funcionalidad, tarea o script que se debe implementar)_  
++**Para que** _(beneficio o razón de negocio que aporta esta funcionalidad al proyecto GitOps Local)_
++
++---
++
++## Suposiciones
++
++- _Listar restricciones, supuestos o dependencias conocidas._  
++- _Mencionar historias de usuario o issues relacionadas (si aplica)._
++
++---
++
++## Criterios de aceptación
++
++```gherkin
++Escenario: <Descripción breve>
++Dado <contexto inicial o estado del sistema>
++Cuando <el usuario realiza una acción o se completa la tarea>
++Entonces <resultado esperado o comportamiento que valide la historia>
++Y <otras condiciones adicionales si corresponde>
++```
+
+commit 57d6ea19e347845865cfc45731ee9ef3328b62da
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sun Jun 22 15:03:56 2025 -0500
+
+    chore(CHANGELOG): Agrega script genera_changelog.py
+    
+    Este script automatiza la actualización del archivo
+    CHANGELOG.md con cada commit.
+---
+ genera_changelog.py | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/genera_changelog.py b/genera_changelog.py
+new file mode 100644
+index 0000000..eee892e
+--- /dev/null
++++ b/genera_changelog.py
+@@ -0,0 +1,31 @@
++import subprocess
++import sys
++
++def get_commit_info(commit_hash):
++    try:
++        author = subprocess.check_output(
++            ['git', 'show', '-s', '--format=%an', commit_hash],
++            text=True
++        ).strip()
++
++        message = subprocess.check_output(
++            ['git', 'show', '-s', '--format=%B', commit_hash],
++            text=True
++        ).strip().split(':')[-1].strip()
++
++        return author, message
++
++    except subprocess.CalledProcessError as e:
++        print(f"Error: {e}")
++        sys.exit(1)
++
++
++def update_changelog(changelog_file, author, message, commit_hash):
++    with open(changelog_file, 'a', encoding='utf-8') as f:
++        f.write(f"- **{author}**: {message}. Commit: `{commit_hash}`\n")
++
++
++if __name__ == "__main__":
++    commit_hash = sys.argv[1]
++    author, message = get_commit_info(commit_hash)
++    update_changelog('CHANGELOG.md', author, message, commit_hash)
+
+commit 16a0f80d5af863d4db8d68565855ca9688393206
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 23 23:22:40 2025 -0500
+
+    feat(Dockerfile): Agrega una simple app contenerizada
+---
+ simple-app/Dockerfile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/simple-app/Dockerfile b/simple-app/Dockerfile
+new file mode 100644
+index 0000000..2d6ccc0
+--- /dev/null
++++ b/simple-app/Dockerfile
+@@ -0,0 +1,5 @@
++FROM ubuntu:latest
++
++RUN apt-get update && apt-get install -y iputils-ping
++
++CMD ["/bin/bash"]
+\ No newline at end of file
+
+commit 45f97c273892939df4414959046d518f5fb9ebf4
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Tue Jun 24 00:00:11 2025 -0500
+
+    chore(githook): Agrega commit-msg
+    
+    Este hook de git validara el formato de los mensajes
+    de cada commit.
+---
+ .githooks/commit-msg | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/.githooks/commit-msg b/.githooks/commit-msg
+new file mode 100644
+index 0000000..161caaf
+--- /dev/null
++++ b/.githooks/commit-msg
+@@ -0,0 +1,13 @@
++#!/usr/bin/bash
++
++RED='\033[0;31'
++NC='\033[0m'
++echo "Ejecutandose hook: commit-msg"
++MSG="$1"
++PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1, 65}$'
++
++if [[ ! grep -Eq "$PATTERN" "$MSG" ]]; then
++    echo "${RED}Mensaje de commit invalido.${NC}"
++    echo "Debe seguir patron: tipo(alcance): descripcion breve"
++    exit 1
++fi
+
+commit fa8d8999a755dc55a13f9ff873b2ab95f0a2248d
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Tue Jun 24 00:07:37 2025 -0500
+
+    docs(README): Actualiza README Sprint 1 Dia 2
+---
+ README.md | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index 412c0a3..1da8c3c 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,20 @@
+-# Adaptador--comandos-contenedores
+\ No newline at end of file
++# Adaptador--comandos-contenedores
++
++### Estructura
++
++```text
++├── CHANGELOG.md
++├── genera_changelog.py
++├── README.md
++└── simple-app
++    └── Dockerfile
++```
++
++
++### Paso 0
++
++Para definir la carpeta que usara Git para lanzar los hooks:
++
++```sh
++git config core.hooksPath .githooks
++```
+\ No newline at end of file
+
+commit ca4c8a569247a78c52bee4809e6837cdfbd5fa83
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Tue Jun 24 00:08:09 2025 -0500
+
+    docs(CHANGELOG): Agrega CHANGELOG.md
+---
+ CHANGELOG.md | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+new file mode 100644
+index 0000000..d7923f2
+--- /dev/null
++++ b/CHANGELOG.md
+@@ -0,0 +1,10 @@
++# Sprint 1
++
++## Dia 1
++
++
++- **YoelMantari**: agregar plantilla para historias de usuario. Commit: `f658dc0`
++
++
++## Dia 2
++- **Dirac**: Agrega una simple app contenerizada. Commit: `16a0f80`
+
+commit b1888f0cdea04b83e978fa3527d6f126702aebac
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Tue Jun 24 00:08:35 2025 -0500
+
+    chore(gitignore): Agrega gitignore
+---
+ .gitignore | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..ec5fabe
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,6 @@
++# Entorno virtual
++
++.venv
++
++# PC4
++PC4.md
+\ No newline at end of file
+
+commit e377cb8273190d6e088530908ec7cfc2f5d717e0
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Tue Jun 24 14:48:29 2025 -0500
+
+    feat(githook): Se añade pre-commit para Sprint 1
+    
+    El hook pre-commit valida los archivos Dockerfile
+---
+ .githooks/pre-commit | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ otra/Dockerfile      |  4 ++++
+ 2 files changed, 49 insertions(+)
+
+diff --git a/.githooks/pre-commit b/.githooks/pre-commit
+new file mode 100755
+index 0000000..e551aea
+--- /dev/null
++++ b/.githooks/pre-commit
+@@ -0,0 +1,45 @@
++#!/usr/bin/bash
++
++RED='\033[0;31m'
++GREEN='\033[0;32m'
++NC='\033[0m'
++
++DOCKERFILES=$(git diff --staged --name-only | grep Dockerfile )
++
++if [[ -z $DOCKERFILES ]]; then
++    echo "No hay Dockerfiles por validar"
++    exit 0
++fi
++
++for dockerfile in ${DOCKERFILES[@]}; do
++
++    # Validacion de tag
++    if [[ -z $(grep -E '^FROM .+:(.{1,})$' $dockerfile) ]]; then
++        echo -e "${RED}No se cumple el patrón 'FROM <imagen>:<tag>'.${NC}"
++        exit 1
++    fi
++    
++    # Tag no puede ser latest
++    tag=$(grep -oP '^FROM .+:\K(.{1,})$' $dockerfile)
++    if [[ $tag == "latest" ]]; then
++        echo -e "${RED}Tag no puede ser latest.${NC}"
++        exit 1
++    fi
++
++    # Validacion del comando apt-get update
++    if [[ $(grep -cE '(apt-get|apt) update' $dockerfile) > 1 ]]; then
++        echo -e "${RED}Se debe usar el comando apt-update una sola vez.${NC}"
++        exit 1
++    fi
++
++    # Validar que la instruccion RUN este antes de la instruccion COPY (si existe)
++    ultima_linea_RUN=$(grep -n RUN $dockerfile | tail -n 1 | cut -d ':' -f 1)
++    primera_linea_COPY=$(grep -n COPY $dockerfile | head -n 1 | cut -d ':' -f 1)
++    if [[ ! $ultima_linea_RUN < $primera_linea_COPY ]]; then
++        echo -e "${RED}Linea de instrucción 'COPY': ${primera_linea_COPY} debe estar al final " \
++            "de linea de instrucción 'RUN': ${ultima_linea_RUN}.${NC}"
++        exit 1
++    fi
++done
++
++echo -e "${GREEN}Validaciones corectas en archivo(s) Dockerfile.${NC}"
+diff --git a/otra/Dockerfile b/otra/Dockerfile
+new file mode 100644
+index 0000000..84ca0dd
+--- /dev/null
++++ b/otra/Dockerfile
+@@ -0,0 +1,4 @@
++FROM ubuntu
++
++RUN apt-get update && apt install openjdk-8-jdk -y
++RUN apt-get update && apt install vim -y
+\ No newline at end of file
+
+commit 82194fbeca0cfd4b57c6d8273f3353b9372ce107
+Merge: f658dc0 e377cb8
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Tue Jun 24 15:56:11 2025 -0500
+
+    Merge pull request #5 from YoelMantari/feature/cli-docker-mitchel
+    
+    Feature/cli docker mitchel
+
+commit 8b44cc87282b52914d17cccd95166f982f29e132
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Thu Jun 26 20:57:19 2025 -0500
+
+    docs(README): Actualiza README para Sprint 1
+---
+ .gitignore      | 10 +++++++++-
+ README.md       | 21 +++++++++++++++++++++
+ otra/Dockerfile |  4 ----
+ 3 files changed, 30 insertions(+), 5 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index ec5fabe..f4f55dd 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,4 +3,12 @@
+ .venv
+ 
+ # PC4
+-PC4.md
+\ No newline at end of file
++PC4.md
++
++# Recursos que se usaron en el proyecto
++recursos
++
++# Reglas minimas para archivos Dockerfile
++template-df
++
++# Otros
+diff --git a/README.md b/README.md
+index 1da8c3c..26e5726 100644
+--- a/README.md
++++ b/README.md
+@@ -17,4 +17,25 @@ Para definir la carpeta que usara Git para lanzar los hooks:
+ 
+ ```sh
+ git config core.hooksPath .githooks
++```
++
++### Paso 1
++
++Descagar la imagen de DockerHub
++
++```sh
++$ docker pull dirac22/simple-app:1.0.0
++```
++
++Ejecutar el contenedor:
++
++```sh
++$ docker run -it --name my-simple-app dirac22/simple-app:1.0.0
++```
++
++Estando ahora en "el terminal del contenedor"
++
++Ejecutar ping (como ejemplo)
++```sh
++/# ping -c 4 google.com
+ ```
+\ No newline at end of file
+diff --git a/otra/Dockerfile b/otra/Dockerfile
+deleted file mode 100644
+index 84ca0dd..0000000
+--- a/otra/Dockerfile
++++ /dev/null
+@@ -1,4 +0,0 @@
+-FROM ubuntu
+-
+-RUN apt-get update && apt install openjdk-8-jdk -y
+-RUN apt-get update && apt install vim -y
+\ No newline at end of file
+
+commit 331ab93595bcf5ef2e808e9fc61648f8b17abdf7
+Merge: 82194fb 8b44cc8
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Thu Jun 26 21:09:41 2025 -0500
+
+    Merge pull request #6 from YoelMantari/feature/cli-docker-mitchel
+    
+    docs(README): Actualiza README para Sprint 1
+
+commit 370708770060c7e3344d2cee20f374aedc824ab2
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Thu Jun 26 21:28:03 2025 -0500
+
+    feat(cli): listar contenedores docker activos
+---
+ cli/container_exec.py | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+new file mode 100644
+index 0000000..0132e03
+--- /dev/null
++++ b/cli/container_exec.py
+@@ -0,0 +1,26 @@
++import subprocess
++import sys
++
++
++def listar_contenedores() -> list[str]:
++    """
++    Lista los contenedores docker en ejecucion usando docker ps
++    retorna el id imagen por cada contenedor
++    """
++    resultado = subprocess.run(
++        ["docker", "ps", "--format", "{{.ID}}: {{.Image}} - {{.Names}}"],
++        stdout=subprocess.PIPE,
++        text=True
++    )
++
++    contenedores: list[str] = resultado.stdout.strip().split("\n")
++
++    if not contenedores or contenedores == ['']:
++        print("No hay contenedores en ejecucion.")
++        sys.exit(0)
++
++    print("\nContenedores activos:")
++    for i, cont in enumerate(contenedores):
++        print(f"{i + 1}. {cont}")
++    return contenedores
++
+
+commit e3ed8bc4d38f5f9ab48dd6fcb5d9722aef17e227
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Thu Jun 26 21:38:55 2025 -0500
+
+    feat(cli): se agrega seleccionar_contenedor por indice
+---
+ cli/container_exec.py | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 0132e03..c7bd02b 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -24,3 +24,21 @@ def listar_contenedores() -> list[str]:
+         print(f"{i + 1}. {cont}")
+     return contenedores
+ 
++
++def seleccionar_contenedor(contenedores: list[str]) -> str:
++    """
++    Permite al usuario selecciona un contenedor por indice,
++    se lista los contenedores disponibles
++    retorna el id del contenedor seleccionado
++    """
++    try:
++        indice = int(input("\nSelecciona un contenedor (numero): ")) - 1
++    except ValueError:
++        print("Entrada invalida, debe ser un numero entero")
++        sys.exit(1)
++
++    if 0 <= indice < len(contenedores):
++        return contenedores[indice].split(":")[0]
++    else:
++        print("Índice inválido.")
++        sys.exit(1)
+\ No newline at end of file
+
+commit 523b7dd456960f54df97b51084c73dafd3dd373c
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Thu Jun 26 21:43:59 2025 -0500
+
+    feat(cli): agregar ejecutar_comando
+    
+    permite ejecutar comandos arbitrarios en el contenedor seleccionado.
+---
+ cli/container_exec.py | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index c7bd02b..62ad27b 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -41,4 +41,24 @@ def seleccionar_contenedor(contenedores: list[str]) -> str:
+         return contenedores[indice].split(":")[0]
+     else:
+         print("Índice inválido.")
+-        sys.exit(1)
+\ No newline at end of file
++        sys.exit(1)
++
++
++def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
++    """
++    Ejecuta comando arbitrario dentro del contenedor docker.
++    Se toma el id o nombre del contenedor del docker, y el comando
++    a ejecutar.
++    """
++    resultado = subprocess.run(
++        ["docker", "exec", contenedor_id] + comando,
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True
++    )
++    print("\nSalida estandar:")
++    print(resultado.stdout)
++    print("Errores:")
++    print(resultado.stderr)
++
++
+
+commit a660ee755c71530d4460524f5a3ce0ea2b9e6e6f
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Thu Jun 26 21:46:33 2025 -0500
+
+    feat(cli): implementar flujo cli
+    
+    se agrega la funcion main para el uso del script
+---
+ cli/container_exec.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 62ad27b..dbbd5c0 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -62,3 +62,12 @@ def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
+     print(resultado.stderr)
+ 
+ 
++def main():
++    contenedores = listar_contenedores()
++    contenedor_id = seleccionar_contenedor(contenedores)
++    comando = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
++    ejecutar_comando(contenedor_id, comando)
++
++
++if __name__ == "__main__":
++    main()
+
+commit 196fb51a3a609d77e4bb8b4b993fb110340efaa7
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Thu Jun 26 21:49:47 2025 -0500
+
+    docs(README): se actualiza ejecucion del proyecto
+    
+    paso 2, ejecucion del container_exce.py
+---
+ README.md | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index 26e5726..6252096 100644
+--- a/README.md
++++ b/README.md
+@@ -38,4 +38,12 @@ Estando ahora en "el terminal del contenedor"
+ Ejecutar ping (como ejemplo)
+ ```sh
+ /# ping -c 4 google.com
+-```
+\ No newline at end of file
++```
++
++### Paso 2
++Ejecutar el script:
++```sh
++python3 container_exec.py
++```
++Se mostrara un listado numerado de contenedores activos.
++Por ejemplo (ps, ps aux, ping, ls, ... etc)
+\ No newline at end of file
+
+commit 3744b74d0f56d426ab95d03448da8ffe25125070
+Merge: 331ab93 196fb51
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Thu Jun 26 22:00:52 2025 -0500
+
+    Merge pull request #7 from YoelMantari/feature/cli-docker-yoel
+    
+    Implementar herramienta para ejecutar comandos en contenedores docker activos
+
+commit 467e6c46366116558f0673dc672d27e0042c51f5
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Fri Jun 27 23:59:52 2025 -0500
+
+    docs(video): Agrega video para Sprint 1
+    
+    Se modifica githook commit-msg
+---
+ .githooks/commit-msg |   4 ++--
+ .gitignore           |   2 +-
+ videos/Sprint-1.mp4  | Bin 0 -> 48032916 bytes
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/.githooks/commit-msg b/.githooks/commit-msg
+index 161caaf..71d9f85 100644
+--- a/.githooks/commit-msg
++++ b/.githooks/commit-msg
+@@ -4,9 +4,9 @@ RED='\033[0;31'
+ NC='\033[0m'
+ echo "Ejecutandose hook: commit-msg"
+ MSG="$1"
+-PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1, 65}$'
++PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1,65}$'
+ 
+-if [[ ! grep -Eq "$PATTERN" "$MSG" ]]; then
++if [ ! grep -Eq "$PATTERN" "$MSG" ]; then
+     echo "${RED}Mensaje de commit invalido.${NC}"
+     echo "Debe seguir patron: tipo(alcance): descripcion breve"
+     exit 1
+diff --git a/.gitignore b/.gitignore
+index f4f55dd..44ba2e4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -9,6 +9,6 @@ PC4.md
+ recursos
+ 
+ # Reglas minimas para archivos Dockerfile
+-template-df
++validaciones-dockerfile
+ 
+ # Otros
+diff --git a/videos/Sprint-1.mp4 b/videos/Sprint-1.mp4
+new file mode 100644
+index 0000000..9bdb74f
+Binary files /dev/null and b/videos/Sprint-1.mp4 differ
+
+commit 34069b4c49c4f77bdb0f2dffc3a3a29f7061530d
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 18:27:38 2025 -0500
+
+    chore(githooks): Agrega post-commit y actualiza commit-msg
+    
+    El git hook post-commit ejecutará un script en python
+    que actualizara el CHANGELOG con el ultimo cambio
+    realizado (a través del commit).
+    El commit-msg sufrió una ligera modificación (refactoring)
+    que no ha alterado su funcionamiento
+---
+ .githooks/commit-msg  |  0
+ .githooks/post-commit | 11 +++++++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/.githooks/commit-msg b/.githooks/commit-msg
+old mode 100644
+new mode 100755
+diff --git a/.githooks/post-commit b/.githooks/post-commit
+new file mode 100755
+index 0000000..76b9c13
+--- /dev/null
++++ b/.githooks/post-commit
+@@ -0,0 +1,11 @@
++#!/usr/bin/bash
++
++COMMIT_SHORT_HASH=$(git rev-parse --short HEAD)
++
++python3 genera_changelog.py $COMMIT_SHORT_HASH
++
++if [ $? -ne 0 ]; then
++    echo "Ocurrió un error al actualizar el CHANGELOG con el commit $COMMIT_SHORT_HASH"
++fi
++
++
+
+commit 6d7d4086172586d8179a0c669be3f3f8f4e45cc7
+Merge: 3744b74 467e6c4
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Sat Jun 28 20:28:02 2025 -0500
+
+    Merge pull request #8 from YoelMantari/feature/cli-docker-mitchel
+    
+    docs(video): Agrega video para Sprint 1
+
+commit bf062960f1506309d2aabb8a4a3fd099f2ceeb0a
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 21:20:49 2025 -0500
+
+    chore(gitignore): Arregla commit-msg
+---
+ .githooks/commit-msg | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.githooks/commit-msg b/.githooks/commit-msg
+index 71d9f85..9a6e890 100755
+--- a/.githooks/commit-msg
++++ b/.githooks/commit-msg
+@@ -1,13 +1,13 @@
+ #!/usr/bin/bash
+ 
+-RED='\033[0;31'
++RED='\033[0;31m'
+ NC='\033[0m'
+ echo "Ejecutandose hook: commit-msg"
+ MSG="$1"
+ PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1,65}$'
+ 
+ if [ ! grep -Eq "$PATTERN" "$MSG" ]; then
+-    echo "${RED}Mensaje de commit invalido.${NC}"
++    echo -e "${RED}Mensaje de commit invalido.${NC}"
+     echo "Debe seguir patron: tipo(alcance): descripcion breve"
+     exit 1
+ fi
+
+commit d7afe5dca097f4b28c08d7c1807a574df1bb11b8
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 21:23:36 2025 -0500
+
+    chore(gitignore): Arregla commit-msg
+---
+ .githooks/commit-msg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.githooks/commit-msg b/.githooks/commit-msg
+index 9a6e890..b51158a 100755
+--- a/.githooks/commit-msg
++++ b/.githooks/commit-msg
+@@ -6,7 +6,7 @@ echo "Ejecutandose hook: commit-msg"
+ MSG="$1"
+ PATTERN='^(feat|fix|docs|chore|ci|refactor|test)(\([a-zA-Z0-9_-]+\))?: .{1,65}$'
+ 
+-if [ ! grep -Eq "$PATTERN" "$MSG" ]; then
++if ! grep -Eq "$PATTERN" "$MSG"; then
+     echo -e "${RED}Mensaje de commit invalido.${NC}"
+     echo "Debe seguir patron: tipo(alcance): descripcion breve"
+     exit 1
+
+commit 55a6ef0348eb131798001a3732d656c6a26e5625
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 21:25:21 2025 -0500
+
+    chore(gitignore): Primera actualizacion Sprint 2
+---
+ .gitignore | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index 44ba2e4..eb6c6d5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -12,3 +12,5 @@ recursos
+ validaciones-dockerfile
+ 
+ # Otros
++
++historial-comandos.*
+
+commit 154ee13276e9fa3c9476d72ce3b07308f1cb5c7d
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 21:25:50 2025 -0500
+
+    docs(varios): Actualiza para inicio de Sprint 2
+    
+    Actualiza README para inicio de Sprint 2
+    Actualiza CHANGELOG para inicio de Sprint 2
+    Agrega script `genera_changelog.py` para
+    automatizar actualizar el CHANGELOG.
+---
+ CHANGELOG.md        |  13 ++++++
+ README.md           | 115 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ genera_changelog.py |   2 +-
+ 3 files changed, 129 insertions(+), 1 deletion(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index d7923f2..591ee31 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -8,3 +8,16 @@
+ 
+ ## Dia 2
+ - **Dirac**: Agrega una simple app contenerizada. Commit: `16a0f80`
++  
++
++## Dia 3
++
++
++- **Dirac**: Agrega post-commit y actualiza commit-msg. Commit: `34069b4`
++
++
++- **Dirac**: Arregla commit-msg. Commit: `bf06296`
++
++- **Dirac**: Arregla commit-msg. Commit: `d7afe5d`
++
++- **Dirac**: Primera actualizacion Sprint 2. Commit: `55a6ef0`
+diff --git a/README.md b/README.md
+index 6252096..31094e3 100644
+--- a/README.md
++++ b/README.md
+@@ -2,6 +2,121 @@
+ 
+ ### Estructura
+ 
++```text
++├── CHANGELOG.md
++├── cli
++│   └── container_exec.py
++├── deployment.yaml
++├── genera_changelog.py
++├── .githooks
++│   ├── commit-msg
++│   ├── post-commit
++│   └── pre-commit
++├── .github
++│   └── ISSUE_TEMPLATE
++│       └── historia-de-usuario.md
++├── .gitignore
++├── README.md
++├── simple-app
++│   └── Dockerfile
++└── videos
++    └── Sprint-1.mp4
++```
++
++
++## Sprint 2
++
++### Paso 0
++Instalar Kubernetes y Minikube
++
++### Paso 1
++
++Descargar la imagén de DockerHub. Nueva versión `1.1.0`
++
++```sh
++$ docker pull dirac22/simple-app:1.1.0
++```
++
++O construir la imagen:
++
++```sh
++docker build -t <user>/simple-app:1.1.0 ./simple-app
++```
++
++### Paso 2
++
++Cargar la imagen en minikube
++
++```sh
++$ minikube image load dirac22/simple-app:1.1.0
++```
++    
++Siempre asegurarse que Minikube este corriendo
++
++```sh
++$ minikube status
++
++# Debe salir:
++host: Running
++kubelet: Running
++apiserver: Running
++```
++
++Sino hay varias opciones:
++
++Iniciar nuevamente Minikube:
++
++```sh
++$ minikube start
++```
++
++O también inciar con una versión específica
++
++```sh
++$ minikube delete
++$ minikube start --kubernetes-version=v1.33.1
++```
++
++Asegurate que Minikube este corriendo exitosamente.
++
++### Paso 3
++
++Aplicar el manifiesto
++
++```sh
++$ kubectl appy -f deployment.yaml
++```
++
++### Paso 4
++
++Verificar el Deployment
++```sh
++$ kubectl get deployments
++```
++    
++Deberia salir el de simple-app-deployment
++
++Verificar los pods
++
++```sh
++$ kubeclt get pods
++# Debe salir el simple-app-deployment-<identificador>
++```
++
++### Paso 5
++
++Probar un comando dentro del Pod
++
++```sh
++kubectl exec -it simple-app-deployment-<identificador> -- ping -c 4 google.com
++```
++
++
++
++## Sprint 1
++
++### Estructura
++
+ ```text
+ ├── CHANGELOG.md
+ ├── genera_changelog.py
+diff --git a/genera_changelog.py b/genera_changelog.py
+index eee892e..252d525 100644
+--- a/genera_changelog.py
++++ b/genera_changelog.py
+@@ -22,7 +22,7 @@ def get_commit_info(commit_hash):
+ 
+ def update_changelog(changelog_file, author, message, commit_hash):
+     with open(changelog_file, 'a', encoding='utf-8') as f:
+-        f.write(f"- **{author}**: {message}. Commit: `{commit_hash}`\n")
++        f.write(f"\n- **{author}**: {message}. Commit: `{commit_hash}`\n")
+ 
+ 
+ if __name__ == "__main__":
+
+commit e38eddb2578cbb67271b31751ff77994afc51c72
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 21:33:14 2025 -0500
+
+    feat(deployment): Agrega manifiesto deployment.yaml
+    
+    Agrega manifiesto para despliegue enb Kubernetes
+    Se modifca el archivo Dockerfile para poder hacer
+    el despliegue
+---
+ deployment.yaml       | 21 +++++++++++++++++++++
+ simple-app/Dockerfile |  4 ++--
+ 2 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/deployment.yaml b/deployment.yaml
+new file mode 100644
+index 0000000..01976cc
+--- /dev/null
++++ b/deployment.yaml
+@@ -0,0 +1,21 @@
++apiVersion: apps/v1
++
++kind: Deployment
++
++metadata:
++  name: simple-app-deployment
++
++spec:
++  replicas: 1
++  selector:
++    matchLabels:
++      app: simple-app
++  template:
++    metadata:
++      labels:
++        app: simple-app
++    spec:
++      containers:
++      - name: simple-app-container
++        image: dirac22/simple-app:1.1.0
++        imagePullPolicy: IfNotPresent
+\ No newline at end of file
+diff --git a/simple-app/Dockerfile b/simple-app/Dockerfile
+index 2d6ccc0..a160788 100644
+--- a/simple-app/Dockerfile
++++ b/simple-app/Dockerfile
+@@ -1,5 +1,5 @@
+-FROM ubuntu:latest
++FROM ubuntu:22.04
+ 
+ RUN apt-get update && apt-get install -y iputils-ping
+ 
+-CMD ["/bin/bash"]
+\ No newline at end of file
++CMD ["tail", "-f", "/dev/null"]
+\ No newline at end of file
+
+commit 38086185220f220f60d0fe1fe7337ffc5774715a
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 21:34:56 2025 -0500
+
+    chore(varios): Cambios en CHANGELOG y pre-commit
+---
+ .githooks/pre-commit |  3 +++
+ CHANGELOG.md         | 14 +++++++++-----
+ 2 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/.githooks/pre-commit b/.githooks/pre-commit
+index e551aea..e6e8840 100755
+--- a/.githooks/pre-commit
++++ b/.githooks/pre-commit
+@@ -35,6 +35,9 @@ for dockerfile in ${DOCKERFILES[@]}; do
+     # Validar que la instruccion RUN este antes de la instruccion COPY (si existe)
+     ultima_linea_RUN=$(grep -n RUN $dockerfile | tail -n 1 | cut -d ':' -f 1)
+     primera_linea_COPY=$(grep -n COPY $dockerfile | head -n 1 | cut -d ':' -f 1)
++    if [[ -z $primera_linea_COPY ]]; then
++        exit 0
++    fi
+     if [[ ! $ultima_linea_RUN < $primera_linea_COPY ]]; then
+         echo -e "${RED}Linea de instrucción 'COPY': ${primera_linea_COPY} debe estar al final " \
+             "de linea de instrucción 'RUN': ${ultima_linea_RUN}.${NC}"
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 591ee31..7507e45 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -14,10 +14,14 @@
+ 
+ 
+ - **Dirac**: Agrega post-commit y actualiza commit-msg. Commit: `34069b4`
++- **Dirac**: Primera actualizacion Sprint 2. Commit: `55a6ef0`
++- **Dirac**: Actualiza para inicio de Sprint 2. Commit: `154ee13`
++  - Actualiza README para inicio de Sprint 2
++  - Actualiza CHANGELOG para inicio de Sprint 2
++  - Agrega script `genera_changelog.py` para automatizar actualizar el CHANGELOG
+ 
++- **Dirac**: Agrega manifiesto deployment.yaml
+ 
+-- **Dirac**: Arregla commit-msg. Commit: `bf06296`
+-
+-- **Dirac**: Arregla commit-msg. Commit: `d7afe5d`
+-
+-- **Dirac**: Primera actualizacion Sprint 2. Commit: `55a6ef0`
++Agrega manifiesto para despliegue enb Kubernetes
++Se modifca el archivo Dockerfile para poder hacer
++el despliegue. Commit: `e38eddb`
+
+commit e85351126d74740e3588cdbc8ca648308b99e7e4
+Merge: f658dc0 6d7d408
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Sat Jun 28 21:50:09 2025 -0500
+
+    Merge pull request #9 from YoelMantari/feature/cli-docker
+    
+    Feature/cli docker
+
+commit c4d9e6b24063292f94fbe15602c1dc55dd8896a1
+Merge: 6d7d408 3808618
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Sat Jun 28 22:14:13 2025 -0500
+
+    Merge pull request #11 from YoelMantari/feature/cli-docker-mitchel
+    
+    Feature/cli docker mitchel
+
+commit cdb4bbb90b3514fd2f0ba20e8004a27588893619
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sat Jun 28 23:06:58 2025 -0500
+
+    feat(varios): Archivos iniciales para pruebas unitarias
+    
+    Se agrego archivos `__init__.py` en carpeta `cli` y
+    `tests`. Se agrego archivo ``requeriments.txt
+---
+ CHANGELOG.md      | 8 +++-----
+ cli/__init__.py   | 0
+ requeriments.txt  | 2 ++
+ tests/__init__.py | 0
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 7507e45..efb37a4 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -20,8 +20,6 @@
+   - Actualiza CHANGELOG para inicio de Sprint 2
+   - Agrega script `genera_changelog.py` para automatizar actualizar el CHANGELOG
+ 
+-- **Dirac**: Agrega manifiesto deployment.yaml
+-
+-Agrega manifiesto para despliegue enb Kubernetes
+-Se modifca el archivo Dockerfile para poder hacer
+-el despliegue. Commit: `e38eddb`
++- **Dirac**: Agrega manifiesto deployment.yaml. Commit: `e38eddb`
++  - Agrega manifiesto para despliegue enb Kubernetes
++  - Se modifca el archivo Dockerfile para poder hacer el despliegue. 
+diff --git a/cli/__init__.py b/cli/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/requeriments.txt b/requeriments.txt
+new file mode 100644
+index 0000000..1d6ed5c
+--- /dev/null
++++ b/requeriments.txt
+@@ -0,0 +1,2 @@
++pytest
++pytest-mock
+\ No newline at end of file
+diff --git a/tests/__init__.py b/tests/__init__.py
+new file mode 100644
+index 0000000..e69de29
+
+commit 2fd72dd1d657ad97b2e1cf726a681460473e8dc2
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Sun Jun 29 16:52:57 2025 -0500
+
+    feat(cli): listar pods de kubernetes desde la cli
+    
+    se añade la funcion listar_pods(), que imprime en forma enumerada los pods
+---
+ cli/container_exec.py | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index dbbd5c0..ec45657 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -25,6 +25,24 @@ def listar_contenedores() -> list[str]:
+     return contenedores
+ 
+ 
++def listar_pods() -> list[str]:
++    """
++    Lista pods en Kubernetes
++    """
++    resultado = subprocess.run(
++        ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"],
++        stdout=subprocess.PIPE, text=True, check=True
++    )
++    pods = resultado.stdout.strip().splitlines()[1:]  
++    if not pods:
++        print("No hay pods en el namespace actual.")
++        sys.exit(0)
++    print("\nPods Kubernetes activos:")
++    for i, pod in enumerate(pods, 1):
++        print(f"{i}. {pod}")
++    return pods
++
++
+ def seleccionar_contenedor(contenedores: list[str]) -> str:
+     """
+     Permite al usuario selecciona un contenedor por indice,
+@@ -70,4 +88,4 @@ def main():
+ 
+ 
+ if __name__ == "__main__":
+-    main()
++    main()
+\ No newline at end of file
+
+commit c27325a966b6790fa9da1afc8e520e6c2246c1b9
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Sun Jun 29 16:59:14 2025 -0500
+
+    refactor(cli): mejorar seleccion de contenedor por id o nombre
+    
+    se actualiza la funcion seleccionar_contenedor() para que se ingresar el id o nombre del contenedor en lugar de indice
+---
+ cli/container_exec.py | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index ec45657..8a41251 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -45,21 +45,21 @@ def listar_pods() -> list[str]:
+ 
+ def seleccionar_contenedor(contenedores: list[str]) -> str:
+     """
+-    Permite al usuario selecciona un contenedor por indice,
+-    se lista los contenedores disponibles
+-    retorna el id del contenedor seleccionado
++    Solicita al usuario que ingrese un ID o nombre 
++    valido hasta que lo haga correctamente.
++    Devuelve el ID del contenedor correspondiente.
+     """
+-    try:
+-        indice = int(input("\nSelecciona un contenedor (numero): ")) - 1
+-    except ValueError:
+-        print("Entrada invalida, debe ser un numero entero")
+-        sys.exit(1)
+-
+-    if 0 <= indice < len(contenedores):
+-        return contenedores[indice].split(":")[0]
+-    else:
+-        print("Índice inválido.")
+-        sys.exit(1)
++    while True:
++        entrada = input("\nSelecciona un contenedor (ID o nombre): ").strip()
++        for cont in contenedores:
++            try:
++                cid, resto = cont.split(":", 1)
++                nombre = resto.split(" - ")[1].strip()
++                if entrada == cid or entrada == nombre:
++                    return cid
++            except (IndexError, ValueError):
++                continue  # ignorar formatos inesperados
++        print(f"'{entrada}' no coincide con ningun ID o nombre listado, intentarlo de nuevo")
+ 
+ 
+ def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
+
+commit ab05660ce9b4037f5cdcbf865c5b8ed310fc5c8b
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Sun Jun 29 17:02:33 2025 -0500
+
+    feat(cli): permitir seleccion de pod por numero desde la cli
+    
+    se añade la funcion seleccionar_pod() que solicita al usuario ingresar un numero que esta listado por indice
+---
+ cli/container_exec.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 8a41251..9554f4d 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -80,6 +80,20 @@ def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
+     print(resultado.stderr)
+ 
+ 
++def seleccionar_pod(pods: list[str]) -> str:
++    """
++    Solicita al usuario que seleccione un pod por número.
++    Devuelve el nombre del pod.
++    """
++    while True:
++        entrada = input("\nSelecciona un pod (numero): ").strip()
++        if entrada.isdigit():
++            idx = int(entrada) - 1
++            if 0 <= idx < len(pods):
++                return pods[idx]
++        print(f"'{entrada}' no es un número valido. Intenta nuevamente.")
++
++
+ def main():
+     contenedores = listar_contenedores()
+     contenedor_id = seleccionar_contenedor(contenedores)
+
+commit 1c5ac2139b54ada8175b437aafb0e33c42235758
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Sun Jun 29 17:06:15 2025 -0500
+
+    feat(cli): ejecutar comandos dentro de pods Kubernetes
+    
+    se implementa la funcion ejecutar_comando_k8s() que ejecuta un comando, detecta si es bash y permite interacion directa con pods desde la cli
+---
+ cli/container_exec.py | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 9554f4d..03de222 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -91,7 +91,17 @@ def seleccionar_pod(pods: list[str]) -> str:
+             idx = int(entrada) - 1
+             if 0 <= idx < len(pods):
+                 return pods[idx]
+-        print(f"'{entrada}' no es un número valido. Intenta nuevamente.")
++        print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
++
++
++def ejecutar_comando_k8s(pod: str, comando: list[str]) -> None:
++    """
++    Ejecuta comando arbitrario dentro de un pod de Kubernetes.
++    usando flags para interactuar en bash
++    """
++    flags = ["-i", "-t"] if comando and comando[0] in ("bash", "sh") else []
++    cmd = ["kubectl", "exec"] + flags + [pod, "--"] + comando
++    subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+ 
+ 
+ def main():
+
+commit 583c94ea47d8ecb23da1c40093bfa31e09a92952
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Sun Jun 29 17:12:16 2025 -0500
+
+    refactor(cli): adaptar main para soporte de docker y kubernetes
+    
+    se actualiza la el main para seleccionar tanto contenedores docker como en pods de kubernetes
+---
+ cli/container_exec.py | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 03de222..548f15b 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -1,5 +1,6 @@
+ import subprocess
+ import sys
++import argparse
+ 
+ 
+ def listar_contenedores() -> list[str]:
+@@ -28,12 +29,13 @@ def listar_contenedores() -> list[str]:
+ def listar_pods() -> list[str]:
+     """
+     Lista pods en Kubernetes
++    en ejecucion y los imprime
+     """
+     resultado = subprocess.run(
+         ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"],
+         stdout=subprocess.PIPE, text=True, check=True
+     )
+-    pods = resultado.stdout.strip().splitlines()[1:]  
++    pods = resultado.stdout.strip().splitlines()[1:]
+     if not pods:
+         print("No hay pods en el namespace actual.")
+         sys.exit(0)
+@@ -45,7 +47,7 @@ def listar_pods() -> list[str]:
+ 
+ def seleccionar_contenedor(contenedores: list[str]) -> str:
+     """
+-    Solicita al usuario que ingrese un ID o nombre 
++    Solicita al usuario que ingrese un ID o nombre
+     valido hasta que lo haga correctamente.
+     Devuelve el ID del contenedor correspondiente.
+     """
+@@ -105,10 +107,27 @@ def ejecutar_comando_k8s(pod: str, comando: list[str]) -> None:
+ 
+ 
+ def main():
+-    contenedores = listar_contenedores()
+-    contenedor_id = seleccionar_contenedor(contenedores)
+-    comando = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
+-    ejecutar_comando(contenedor_id, comando)
++    pars = argparse.ArgumentParser(
++        description="Ejecuta comandos en Docker o Kubernetes"
++    )
++    pars.add_argument(
++        "--platform", "-p",
++        choices=["docker", "k8s"],
++        default="docker",
++        help="Plataforma: docker (por defecto) o k8s"
++    )
++    args = pars.parse_args()
++
++    if args.platform == "docker":
++        conts = listar_contenedores()
++        cid = seleccionar_contenedor(conts)
++        cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
++        ejecutar_comando(cid, cmd)
++    else:
++        pods = listar_pods()
++        pod = seleccionar_pod(pods)
++        cmd = input("\nEscribe el comando a ejecutar dentro del pod: ").strip().split()
++        ejecutar_comando_k8s(pod, cmd)
+ 
+ 
+ if __name__ == "__main__":
+
+commit cb397d3ad244c645ebde62bd0413142091cd50f1
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Sun Jun 29 17:32:56 2025 -0500
+
+    docs(info): actualizacion del README Y CHANGELOG
+    
+    se actualiza el README el paso 6 para ejecutar pod o contenedor, y se actualiza en CHANGELOG de lo avanzado el dia 4
+---
+ CHANGELOG.md | 21 +++++++++++++++++++++
+ README.md    | 13 ++++++++++---
+ 2 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 7507e45..0c43eba 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -25,3 +25,24 @@
+ Agrega manifiesto para despliegue enb Kubernetes
+ Se modifca el archivo Dockerfile para poder hacer
+ el despliegue. Commit: `e38eddb`
++
++## Dia 4
++- **YoelMantari**: listar pods de kubernetes desde la cli
++
++se añade la funcion listar_pods(), que imprime en forma enumerada los pods. Commit: `2fd72dd`
++
++- **YoelMantari**: mejorar seleccion de contenedor por id o nombre
++
++se actualiza la funcion seleccionar_contenedor() para que se ingresar el id o nombre del contenedor en lugar de indice. Commit: `c27325a`
++
++- **YoelMantari**: permitir seleccion de pod por numero desde la cli
++
++se añade la funcion seleccionar_pod() que solicita al usuario ingresar un numero que esta listado por indice. Commit: `ab05660`
++
++- **YoelMantari**: ejecutar comandos dentro de pods Kubernetes
++
++se implementa la funcion ejecutar_comando_k8s() que ejecuta un comando, detecta si es bash y permite interacion directa con pods desde la cli. Commit: `1c5ac21`
++
++- **YoelMantari**: adaptar main para soporte de docker y kubernetes
++
++se actualiza la el main para seleccionar tanto contenedores docker como en pods de kubernetes. Commit: `583c94e`
+diff --git a/README.md b/README.md
+index 31094e3..8f41d4d 100644
+--- a/README.md
++++ b/README.md
+@@ -110,8 +110,15 @@ Probar un comando dentro del Pod
+ ```sh
+ kubectl exec -it simple-app-deployment-<identificador> -- ping -c 4 google.com
+ ```
+-
+-
++### Paso 6
++Ejecutar en un pode de kubernetes en modo k8s
++```sh
++python3 cli/container_exec.py --platform k8s
++```
++Ejecutar en un contenedor Docker en modo docker
++```sh
++python3 cli/container_exec.py --platform docker
++```
+ 
+ ## Sprint 1
+ 
+@@ -158,7 +165,7 @@ Ejecutar ping (como ejemplo)
+ ### Paso 2
+ Ejecutar el script:
+ ```sh
+-python3 container_exec.py
++python3 cli/container_exec.py
+ ```
+ Se mostrara un listado numerado de contenedores activos.
+ Por ejemplo (ps, ps aux, ping, ls, ... etc)
+\ No newline at end of file
+
+commit c0e1b686c0a14f4effa1454e4145ba1cba083100
+Merge: c4d9e6b cb397d3
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Sun Jun 29 18:02:36 2025 -0500
+
+    Merge pull request #14 from YoelMantari/feature/cli-docker-yoel
+    
+    Soporte para Kubernetes en la CLI y ejecución de comandos en Pods
+
+commit a2b2cf6811bdde29eb81b91da780ffae24db4975
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sun Jun 29 18:59:06 2025 -0500
+
+    test(container_exec): Agrega primer archivo de prueba
+    
+    Ejecuta pruebas para metodos listar_contenedores y
+    seleccionar_contenedor
+---
+ tests/test_container_exec.py | 69 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
+
+diff --git a/tests/test_container_exec.py b/tests/test_container_exec.py
+new file mode 100644
+index 0000000..f48a583
+--- /dev/null
++++ b/tests/test_container_exec.py
+@@ -0,0 +1,69 @@
++import subprocess
++from unittest.mock import Mock
++import pytest
++from cli.container_exec import listar_contenedores, seleccionar_contenedor
++
++def test_listar_contenedores_existentes(mocker):
++
++    # Arrange
++    texto_simulado = "id1: imagen1 - nombre1\nid2: imagen2 - nombre2"
++    resultado_mock = Mock()
++    resultado_mock.stdout = texto_simulado
++    mock_run = mocker.patch("cli.container_exec.subprocess.run", return_value=resultado_mock)
++    mock_print = mocker.patch("builtins.print")
++
++    # Act
++    contenedores = listar_contenedores()
++
++    # Assert
++    assert contenedores == ["id1: imagen1 - nombre1", "id2: imagen2 - nombre2"]
++
++    mock_run.assert_called_once_with(
++        ["docker", "ps", "--format", "{{.ID}}: {{.Image}} - {{.Names}}"],
++        stdout=subprocess.PIPE,
++        text=True
++    )
++
++    assert mock_print.call_count > 0
++
++
++def test_listar_contenedores_no_hay(mocker):
++
++    # Arrange
++    resultado_mock = Mock()
++    resultado_mock.stdout = ""
++    mocker.patch("cli.container_exec.subprocess.run", return_value=resultado_mock)
++    mocker.patch("builtins.print")
++
++    # Act
++    with pytest.raises(SystemExit) as e:
++        listar_contenedores()
++
++    assert e.type == SystemExit
++    assert e.value.code == 0
++
++
++CONTENEDORES=["id1: img1", "id2: img2"]
++
++@pytest.mark.parametrize(
++    "entrada, id_esperado, falla",
++    [
++        ("1", "id1", False), # Entrada valida
++        ("2", "id2", False), # Entrada valida
++        ("3", "id3", True), # Entrada invalida: solo hay dos contenedores
++        ("abc", True, True), # Entrada invalida: Valores en parametro 1 y 2 no validos
++        ("0", 4, True)  # Entrada invalida: Valores en parametro 1 y 2 no validos
++    ]
++)
++def test_seleccionar_contenedor(mocker, entrada, id_esperado, falla):
++    # Arrange
++    mocker.patch("builtins.input", return_value=entrada)
++    mocker.patch("builtins.print")
++
++    # Act and Arrange
++    if falla:
++        with pytest.raises(SystemExit) as e:
++            seleccionar_contenedor(CONTENEDORES)
++    else:
++        contenedor_id = seleccionar_contenedor(CONTENEDORES)
++        assert contenedor_id == id_esperado
+\ No newline at end of file
+
+commit 6ca428542d284e9ccb911ba120152a9e73f200f1
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sun Jun 29 19:00:49 2025 -0500
+
+    chore(varios): Se agrega requirements y actualiza docs
+---
+ .gitignore                           | 3 +++
+ CHANGELOG.md                         | 9 +++++++++
+ requeriments.txt => requirements.txt | 0
+ 3 files changed, 12 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index eb6c6d5..e090325 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -14,3 +14,6 @@ validaciones-dockerfile
+ # Otros
+ 
+ historial-comandos.*
++
++# __pycache__/
++**/__pycache__/
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index efb37a4..8d44126 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -23,3 +23,12 @@
+ - **Dirac**: Agrega manifiesto deployment.yaml. Commit: `e38eddb`
+   - Agrega manifiesto para despliegue enb Kubernetes
+   - Se modifca el archivo Dockerfile para poder hacer el despliegue. 
++
++- **Dirac**: Archivos iniciales para pruebas unitarias. Commit: `cdb4bbb`
++  - Se agrego archivos `__init__.py` en carpeta `cli` y `tests`. Se agrego archivo ``requeriments.txt.` 
++
++
++- **Dirac**: Agrega primer archivo de prueba
++
++Ejecuta pruebas para metodos listar_contenedores y
++seleccionar_contenedor. Commit: `a2b2cf6`
+diff --git a/requeriments.txt b/requirements.txt
+similarity index 100%
+rename from requeriments.txt
+rename to requirements.txt
+
+commit 5508115a0723b2d38616b61cadca9d03881a8055
+Merge: 6ca4285 c0e1b68
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Sun Jun 29 19:08:27 2025 -0500
+
+    fix(merge): Se resuelven conflictos en CHANGELOG
+
+commit c98a4b5f73d54aca44b09728a1f3d83ed3e57b94
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 00:10:59 2025 -0500
+
+    feat(container_exec): Actualiza script para Sprint 2
+---
+ cli/container_exec.py | 127 ++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 96 insertions(+), 31 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 548f15b..cf67aa5 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -8,40 +8,36 @@ def listar_contenedores() -> list[str]:
+     Lista los contenedores docker en ejecucion usando docker ps
+     retorna el id imagen por cada contenedor
+     """
+-    resultado = subprocess.run(
+-        ["docker", "ps", "--format", "{{.ID}}: {{.Image}} - {{.Names}}"],
+-        stdout=subprocess.PIPE,
+-        text=True
+-    )
+-
++    comando = ["docker", "ps", "--format", "{{.ID}}: {{.Image}} - {{.Names}}"]
++    resultado = subprocess.run(comando, stdout=subprocess.PIPE, text=True)
+     contenedores: list[str] = resultado.stdout.strip().split("\n")
+ 
+     if not contenedores or contenedores == ['']:
+         print("No hay contenedores en ejecucion.")
+         sys.exit(0)
+-
+-    print("\nContenedores activos:")
+-    for i, cont in enumerate(contenedores):
+-        print(f"{i + 1}. {cont}")
+     return contenedores
++    # print("\nContenedores activos:")
++    # for i, cont in enumerate(contenedores):
++    #     print(f"{i + 1}. {cont}")
++    # return contenedores
+ 
+ 
+-def listar_pods() -> list[str]:
++def listar_pods(namespace: str | None) -> list[str]:
+     """
+     Lista pods en Kubernetes
+     en ejecucion y los imprime
+     """
+-    resultado = subprocess.run(
+-        ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"],
+-        stdout=subprocess.PIPE, text=True, check=True
+-    )
++    comando = ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"]
++    if namespace:
++        comando.extend(["-n", namespace])
++    resultado = subprocess.run(comando, stdout=subprocess.PIPE, text=True, check=True)
+     pods = resultado.stdout.strip().splitlines()[1:]
+     if not pods:
+         print("No hay pods en el namespace actual.")
+         sys.exit(0)
+-    print("\nPods Kubernetes activos:")
+-    for i, pod in enumerate(pods, 1):
+-        print(f"{i}. {pod}")
++    # print("\nPods Kubernetes activos:")
++    # for i, pod in enumerate(pods, 1):
++    #     print(f"{i}. {pod}")
+     return pods
+ 
+ 
+@@ -64,7 +60,7 @@ def seleccionar_contenedor(contenedores: list[str]) -> str:
+         print(f"'{entrada}' no coincide con ningun ID o nombre listado, intentarlo de nuevo")
+ 
+ 
+-def ejecutar_comando(contenedor_id: str, comando: list[str]) -> None:
++def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
+     """
+     Ejecuta comando arbitrario dentro del contenedor docker.
+     Se toma el id o nombre del contenedor del docker, y el comando
+@@ -96,17 +92,77 @@ def seleccionar_pod(pods: list[str]) -> str:
+         print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
+ 
+ 
+-def ejecutar_comando_k8s(pod: str, comando: list[str]) -> None:
++def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) -> None:
+     """
+     Ejecuta comando arbitrario dentro de un pod de Kubernetes.
+     usando flags para interactuar en bash
+     """
++    cmd_base = ["kubectl", "exec"]
++    if namespace:
++        cmd_base.extend(["-n", namespace])
+     flags = ["-i", "-t"] if comando and comando[0] in ("bash", "sh") else []
+-    cmd = ["kubectl", "exec"] + flags + [pod, "--"] + comando
++    cmd = cmd_base + flags + [pod, "--"] + comando
+     subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+ 
+ 
++# --- Seleccionar recurso
++
++def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
++    """
++    Mostarmos una lista numerada de recursos (contenedores en docker o pods en kubernetes).
++    Y devolvemos el nombre del recurso seleccionado por el usuario.
++    """
++    print(f"Recursos '{tipo_recurso}' disponibles:")
++    for i, recurso in enumerate(recursos, 1):
++        print(f"{i}. {recurso}")
++
++    while True:
++        try:
++            indice = int(input(f"Selecciona un {tipo_recurso} por número: ")) - 1
++            if 0 <= indice < len(recursos):
++                if tipo_recurso == "contenedor":
++                    return recursos[indice].split(":")[0] # Para contenedores
++                return recursos[indice] # Para pods
++        except ValueError:
++            print("Entrada inválida. Introduce un número")    
++
++# ----------------------------------------------------------------------------------------
++
++# --- Logica de manejo
++
++def manejar_docker():
++    """
++    Para manejar ejecucion de comandos en Docker
++    """
++    recursos = listar_contenedores()
++    if not recursos:
++        return # Termina ejecución si no hay recursos
++    recurso_id = seleccionar_recurso(recursos, "contenedor")
++    comando_str = input(f"\nComando a ejecutar en el contenedor {recurso_id}: ").strip()
++    if not comando_str:
++        print("No se ingreso ningun comando")
++        return
++    ejecutar_comando_docker(recurso_id, comando_str.split())
++
++
++def manejar_kubernetes(namespace: str | None):
++    """
++    Para manejar ejecucion de comandos en Kubernetes
++    """
++    recursos = listar_pods(namespace)
++    if not recursos:
++        return
++    recurso = seleccionar_recurso(recursos, "pod")
++    comando_str = input(f"\nComando a ejecutar en el pod {recurso}: ")
++    if not comando_str:
++        print("No se ingreso ningun comando")
++        return
++    ejecutar_comando_k8s(recurso, namespace, comando_str.split())
++
+ def main():
++    """
++    Funcion principal que parsea los argumentos y dirige el flujo del programa.
++    """
+     pars = argparse.ArgumentParser(
+         description="Ejecuta comandos en Docker o Kubernetes"
+     )
+@@ -116,19 +172,28 @@ def main():
+         default="docker",
+         help="Plataforma: docker (por defecto) o k8s"
+     )
++
++    pars.add_argument(
++        "--namespace", "-n",
++        help="Especifica el namespace de Kubernetes a utilizar. (Solo para la plataforma k8s)"
++    )
++
+     args = pars.parse_args()
+ 
+     if args.platform == "docker":
+-        conts = listar_contenedores()
+-        cid = seleccionar_contenedor(conts)
+-        cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
+-        ejecutar_comando(cid, cmd)
+-    else:
+-        pods = listar_pods()
+-        pod = seleccionar_pod(pods)
+-        cmd = input("\nEscribe el comando a ejecutar dentro del pod: ").strip().split()
+-        ejecutar_comando_k8s(pod, cmd)
+-
++        # conts = listar_contenedores()
++        # cid = seleccionar_contenedor(conts)
++        # cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
++        # ejecutar_comando_docker(cid, cmd)
++        manejar_docker()
++    elif args.platform == "k8s":
++        manejar_kubernetes(args.namespace)
++    # else:
++    #     pods = listar_pods(args.na)
++    #     pod = seleccionar_pod(pods)
++    #     cmd = input("\nEscribe el comando a ejecutar dentro del pod: ").strip().split()
++    #     ejecutar_comando_k8s(pod, cmd)
++    
+ 
+ if __name__ == "__main__":
+     main()
+\ No newline at end of file
+
+commit 01a27837ea01b8481c6044ea8358eaf29ecdbb78
+Merge: c0e1b68 c98a4b5
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Mon Jun 30 00:17:18 2025 -0500
+
+    Merge pull request #15 from YoelMantari/feature/cli-docker-mitchel
+    
+    Feature/cli docker mitchel
+
+commit a3d3c6804f349f30286aacfb75ffaad485f609e5
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 01:46:32 2025 -0500
+
+    test(container_exec): Agrega pruebas unitarias
+    
+    Actualiza archivos de documentacion para finalizar
+    Sprint 2
+---
+ .gitignore                   |   2 +
+ CHANGELOG.md                 |   1 +
+ README.md                    |  10 +++-
+ cli/container_exec.py        |   2 +
+ deployment.yaml              |   3 +-
+ requirements.txt             |   3 +-
+ tests/test_container_exec.py | 114 +++++++++++++++++++++++++++++++++++--------
+ 7 files changed, 111 insertions(+), 24 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index e090325..2e47f13 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -17,3 +17,5 @@ historial-comandos.*
+ 
+ # __pycache__/
+ **/__pycache__/
++
++.coverage
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 6981f28..7867c18 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -50,3 +50,4 @@
+ 
+ 
+ 
++- **Dirac**: Actualiza script para Sprint 2. Commit: `c98a4b5`
+diff --git a/README.md b/README.md
+index 8f41d4d..ce54479 100644
+--- a/README.md
++++ b/README.md
+@@ -84,7 +84,7 @@ Asegurate que Minikube este corriendo exitosamente.
+ Aplicar el manifiesto
+ 
+ ```sh
+-$ kubectl appy -f deployment.yaml
++$ kubectl apply -f deployment.yaml
+ ```
+ 
+ ### Paso 4
+@@ -120,6 +120,14 @@ Ejecutar en un contenedor Docker en modo docker
+ python3 cli/container_exec.py --platform docker
+ ```
+ 
++### Paso 7
++
++Ejecutar pruebas unitarias
++
++```sh
++pytest -v
++```
++
+ ## Sprint 1
+ 
+ ### Estructura
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index cf67aa5..e577ea3 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -121,7 +121,9 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
+             indice = int(input(f"Selecciona un {tipo_recurso} por número: ")) - 1
+             if 0 <= indice < len(recursos):
+                 if tipo_recurso == "contenedor":
++                    print(f"salida: {recursos[indice].split(":")[0]}")
+                     return recursos[indice].split(":")[0] # Para contenedores
++                print(f"{recursos[indice]}")
+                 return recursos[indice] # Para pods
+         except ValueError:
+             print("Entrada inválida. Introduce un número")    
+diff --git a/deployment.yaml b/deployment.yaml
+index 01976cc..e83f7c4 100644
+--- a/deployment.yaml
++++ b/deployment.yaml
+@@ -4,9 +4,10 @@ kind: Deployment
+ 
+ metadata:
+   name: simple-app-deployment
++  namespace: desarrollo
+ 
+ spec:
+-  replicas: 1
++  replicas: 2
+   selector:
+     matchLabels:
+       app: simple-app
+diff --git a/requirements.txt b/requirements.txt
+index 1d6ed5c..a3cd4cf 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,2 +1,3 @@
+ pytest
+-pytest-mock
+\ No newline at end of file
++pytest-mock
++pytest-cov
+\ No newline at end of file
+diff --git a/tests/test_container_exec.py b/tests/test_container_exec.py
+index f48a583..2dd83c2 100644
+--- a/tests/test_container_exec.py
++++ b/tests/test_container_exec.py
+@@ -1,7 +1,14 @@
+ import subprocess
+ from unittest.mock import Mock
+ import pytest
+-from cli.container_exec import listar_contenedores, seleccionar_contenedor
++import sys
++from cli.container_exec import (
++    listar_contenedores,
++    listar_pods,
++    seleccionar_recurso,
++    ejecutar_comando_docker,
++    ejecutar_comando_k8s
++)
+ 
+ def test_listar_contenedores_existentes(mocker):
+ 
+@@ -24,8 +31,6 @@ def test_listar_contenedores_existentes(mocker):
+         text=True
+     )
+ 
+-    assert mock_print.call_count > 0
+-
+ 
+ def test_listar_contenedores_no_hay(mocker):
+ 
+@@ -43,27 +48,94 @@ def test_listar_contenedores_no_hay(mocker):
+     assert e.value.code == 0
+ 
+ 
+-CONTENEDORES=["id1: img1", "id2: img2"]
++def test_listar_pods_con_namespace(mocker):
++
++    # Arrange
++    texto_simulado = "NAME\npod-1\npod-2"
++    mock_run = mocker.patch("cli.container_exec.subprocess.run")
++    mock_run.return_value = Mock(stdout=texto_simulado)
++    namespace_simulado = "desarrollo"
++
++    # Act
++    pods = listar_pods(namespace_simulado)
++
++    # Assert
++    comando_str = ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name", "-n", namespace_simulado]
++    mock_run.assert_called_once_with(comando_str, stdout=subprocess.PIPE, text=True, check=True)
++    assert pods == ["pod-1", "pod-2"]
++
++
++@pytest.mark.parametrize(
++        "tipo, entrada_usuario, id_esperado",
++        [
++            ("contenedor", "1", "id1"),
++            ("pod", "2", "pod-2")
++        ])
++def test_seleccionar_recurso(mocker, tipo, entrada_usuario, id_esperado):
++    # Arrange
++    recursos_prueba = ["id1:img1", "pod-2"]
++    mocker.patch("cli.container_exec.input", return_value=entrada_usuario)
++    mocker.patch("cli.container_exec.print")
++
++    # Act
++    recurso = seleccionar_recurso(recursos_prueba, tipo)
++
++    # Assert
++    assert recurso == id_esperado
++
++@pytest.mark.parametrize("comando", (["echo", "hola"], ["ping", "-c", "4", "google.com"]))
++def test_ejecutar_comando_docker(mocker, comando):
++    # Arrange
++    mock_run = mocker.patch("cli.container_exec.subprocess.run")
++    id_contenedor = "id_simulado"
++    mock_print = mocker.patch("builtins.print")
++
++    # Act
++    ejecutar_comando_docker(id_contenedor, comando)
++    comando_esperado = ["docker", "exec"] + [id_contenedor] + comando
++    
++    # Assert
++    mock_run.assert_called_once_with(
++        ["docker", "exec", id_contenedor] + comando,
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True
++    )
++    assert mock_print.call_count == 4
++    
+ 
+ @pytest.mark.parametrize(
+-    "entrada, id_esperado, falla",
++    "comando, namespace, espera_flags", 
+     [
+-        ("1", "id1", False), # Entrada valida
+-        ("2", "id2", False), # Entrada valida
+-        ("3", "id3", True), # Entrada invalida: solo hay dos contenedores
+-        ("abc", True, True), # Entrada invalida: Valores en parametro 1 y 2 no validos
+-        ("0", 4, True)  # Entrada invalida: Valores en parametro 1 y 2 no validos
++        (["echo", "hola"], "default", False),
++        (["bash"], "desarrollo", True),
++        (["sh", "-c", "ls"], None, True),
++        (["ping", "google.com"], None, False)
+     ]
+ )
+-def test_seleccionar_contenedor(mocker, entrada, id_esperado, falla):
++def test_ejecutar_comando_k8s(mocker, comando, namespace, espera_flags):
+     # Arrange
+-    mocker.patch("builtins.input", return_value=entrada)
+-    mocker.patch("builtins.print")
+-
+-    # Act and Arrange
+-    if falla:
+-        with pytest.raises(SystemExit) as e:
+-            seleccionar_contenedor(CONTENEDORES)
+-    else:
+-        contenedor_id = seleccionar_contenedor(CONTENEDORES)
+-        assert contenedor_id == id_esperado
+\ No newline at end of file
++    mock_run = mocker.patch("cli.container_exec.subprocess.run")
++    pod_name = "pod-simulado"
++    
++    # Act
++    ejecutar_comando_k8s(pod_name, namespace, comando)
++    
++    # Assert - Construcción del comando esperado
++    cmd_esperado = ["kubectl", "exec"]
++    
++    if namespace:
++        cmd_esperado.extend(["-n", namespace])
++    
++    if espera_flags:
++        cmd_esperado.extend(["-i", "-t"])
++    
++    cmd_esperado.extend([pod_name, "--"] + comando)
++    
++    # Verificación completa
++    mock_run.assert_called_once_with(
++        cmd_esperado,
++        stdin=sys.stdin,
++        stdout=sys.stdout,
++        stderr=sys.stderr
++    )
+\ No newline at end of file
+
+commit 070fb7852dfb78d37c722cff6cbf1781cefdc2a1
+Merge: 01a2783 a3d3c68
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Mon Jun 30 02:08:05 2025 -0500
+
+    Merge pull request #16 from YoelMantari/feature/cli-docker-mitchel
+    
+    test(container_exec): Agrega pruebas unitarias
+
+commit 112bbc0535d2d995ce2d4daf69dac6aeb850b752
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 02:19:31 2025 -0500
+
+    refactor(container_exec): Eliminar lineas vacias
+---
+ cli/container_exec.py | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index e577ea3..5789789 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -105,8 +105,6 @@ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) ->
+     subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+ 
+ 
+-# --- Seleccionar recurso
+-
+ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
+     """
+     Mostarmos una lista numerada de recursos (contenedores en docker o pods en kubernetes).
+@@ -128,9 +126,6 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
+         except ValueError:
+             print("Entrada inválida. Introduce un número")    
+ 
+-# ----------------------------------------------------------------------------------------
+-
+-# --- Logica de manejo
+ 
+ def manejar_docker():
+     """
+
+commit 02ca192bdcbf2993e0da48865c628c9dab79f9f2
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 06:44:35 2025 -0500
+
+    feat(cli): se agrega soporte para carga de alias desde config.ini
+---
+ .gitignore            |  2 +-
+ cli/container_exec.py | 46 +++++++++++++---------------------------------
+ 2 files changed, 14 insertions(+), 34 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 2e47f13..8dae7e7 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,7 +1,7 @@
+ # Entorno virtual
+ 
+ .venv
+-
++.env
+ # PC4
+ PC4.md
+ 
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index e577ea3..cb37027 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -1,6 +1,19 @@
+ import subprocess
+ import sys
+ import argparse
++import configparser
++
++
++def cargar_aliases(config_file="config.ini") -> dict:
++    """
++    Carga los alias desde un archivo de configuracion .ini.
++    Devuelve un diccionario con los alias.
++    """
++    config = configparser.ConfigParser()
++    if not config.read(config_file):
++        return {}
++
++    return dict(config.items('aliases'))
+ 
+ 
+ def listar_contenedores() -> list[str]:
+@@ -41,25 +54,6 @@ def listar_pods(namespace: str | None) -> list[str]:
+     return pods
+ 
+ 
+-def seleccionar_contenedor(contenedores: list[str]) -> str:
+-    """
+-    Solicita al usuario que ingrese un ID o nombre
+-    valido hasta que lo haga correctamente.
+-    Devuelve el ID del contenedor correspondiente.
+-    """
+-    while True:
+-        entrada = input("\nSelecciona un contenedor (ID o nombre): ").strip()
+-        for cont in contenedores:
+-            try:
+-                cid, resto = cont.split(":", 1)
+-                nombre = resto.split(" - ")[1].strip()
+-                if entrada == cid or entrada == nombre:
+-                    return cid
+-            except (IndexError, ValueError):
+-                continue  # ignorar formatos inesperados
+-        print(f"'{entrada}' no coincide con ningun ID o nombre listado, intentarlo de nuevo")
+-
+-
+ def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
+     """
+     Ejecuta comando arbitrario dentro del contenedor docker.
+@@ -78,20 +72,6 @@ def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
+     print(resultado.stderr)
+ 
+ 
+-def seleccionar_pod(pods: list[str]) -> str:
+-    """
+-    Solicita al usuario que seleccione un pod por número.
+-    Devuelve el nombre del pod.
+-    """
+-    while True:
+-        entrada = input("\nSelecciona un pod (numero): ").strip()
+-        if entrada.isdigit():
+-            idx = int(entrada) - 1
+-            if 0 <= idx < len(pods):
+-                return pods[idx]
+-        print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
+-
+-
+ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) -> None:
+     """
+     Ejecuta comando arbitrario dentro de un pod de Kubernetes.
+
+commit f3d0fb9a4b7437fa585db5ccb962bea3d482fbab
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 06:49:38 2025 -0500
+
+    feat(cli): permitir seleccion interactiva de pod por numero
+    
+    se agrega la funcion seleccionar_pod que solicita al usuario elegir un pod de una lista numerada
+---
+ cli/container_exec.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index cb37027..106a15c 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -72,6 +72,20 @@ def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
+     print(resultado.stderr)
+ 
+ 
++def seleccionar_pod(pods: list[str]) -> str:
++    """
++    Solicita al usuario que seleccione un pod por número.
++    Devuelve el nombre del pod.
++    """
++    while True:
++        entrada = input("\nSelecciona un pod (numero): ").strip()
++        if entrada.isdigit():
++            idx = int(entrada) - 1
++            if 0 <= idx < len(pods):
++                return pods[idx]
++        print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
++
++
+ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) -> None:
+     """
+     Ejecuta comando arbitrario dentro de un pod de Kubernetes.
+
+commit 0adf775537ab9e8349cf4e488d6ba0b42d34fb0e
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 06:51:08 2025 -0500
+
+    feat(cli): ejecutar comandos en docker con soporte para alias
+---
+ cli/container_exec.py | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 106a15c..abdedf0 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -120,25 +120,29 @@ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
+                 print(f"{recursos[indice]}")
+                 return recursos[indice] # Para pods
+         except ValueError:
+-            print("Entrada inválida. Introduce un número")    
++            print("Entrada inválida. Introduce un número") 
+ 
+ # ----------------------------------------------------------------------------------------
+ 
+ # --- Logica de manejo
+ 
+-def manejar_docker():
++def manejar_docker(aliases: dict):
+     """
+-    Para manejar ejecucion de comandos en Docker
++    Para manejar ejecucion de comandos en Docker.
++    Soporte para alias
+     """
+     recursos = listar_contenedores()
+     if not recursos:
+         return # Termina ejecución si no hay recursos
+     recurso_id = seleccionar_recurso(recursos, "contenedor")
+-    comando_str = input(f"\nComando a ejecutar en el contenedor {recurso_id}: ").strip()
++    comando_str = input(f"\nComando o alias a ejecutar en el contenedor {recurso_id}: ").strip()
+     if not comando_str:
+         print("No se ingreso ningun comando")
+         return
+-    ejecutar_comando_docker(recurso_id, comando_str.split())
++    comando_final_str = aliases.get(comando_str, comando_str)
++    if comando_final_str != comando_str:
++        print(f"Ejecutando alias: '{comando_str}': '{comando_final_str}'\n")
++    ejecutar_comando_docker(recurso_id, comando_final_str.split())
+ 
+ 
+ def manejar_kubernetes(namespace: str | None):
+
+commit 14f039df19cae8e3ea8c07f73385dc3f12506ef4
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 06:52:29 2025 -0500
+
+    refactor(cli): agregar soporte de alias en manejo de pods Kubernetes
+---
+ cli/container_exec.py | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index abdedf0..326019f 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -145,19 +145,24 @@ def manejar_docker(aliases: dict):
+     ejecutar_comando_docker(recurso_id, comando_final_str.split())
+ 
+ 
+-def manejar_kubernetes(namespace: str | None):
++def manejar_kubernetes(namespace: str | None, aliases: dict):
+     """
+-    Para manejar ejecucion de comandos en Kubernetes
++    Para manejar ejecucion de comandos en Kubernetes.
++    Soporte para alias
+     """
+     recursos = listar_pods(namespace)
+     if not recursos:
+         return
+     recurso = seleccionar_recurso(recursos, "pod")
+-    comando_str = input(f"\nComando a ejecutar en el pod {recurso}: ")
++    comando_str = input(f"\nComando o alias a ejecutar en el pod {recurso}: ")
+     if not comando_str:
+         print("No se ingreso ningun comando")
+         return
+-    ejecutar_comando_k8s(recurso, namespace, comando_str.split())
++    comando_final_str = aliases.get(comando_str, comando_str)
++    if comando_final_str != comando_str:
++        print(f"Ejecutando alias: '{comando_str}': '{comando_final_str}'\n")
++    ejecutar_comando_k8s(recurso, namespace, comando_final_str.split())
++
+ 
+ def main():
+     """
+
+commit 641ea928906fe0b147a882bfe832bc598ada9ed5
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 06:53:45 2025 -0500
+
+    refactor(cli): integrar soporte de alias en funcion principal
+    
+    se modifica main() para cargar alias desde config.ini y pasarlos a las funciones de ejecucion.
+---
+ cli/container_exec.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 326019f..bd302f9 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -185,14 +185,16 @@ def main():
+ 
+     args = pars.parse_args()
+ 
++    aliases = cargar_aliases()
++
+     if args.platform == "docker":
+         # conts = listar_contenedores()
+         # cid = seleccionar_contenedor(conts)
+         # cmd = input("\nEscribe el comando a ejecutar dentro del contenedor: ").strip().split()
+         # ejecutar_comando_docker(cid, cmd)
+-        manejar_docker()
++        manejar_docker(aliases)
+     elif args.platform == "k8s":
+-        manejar_kubernetes(args.namespace)
++        manejar_kubernetes(args.namespace, aliases)
+     # else:
+     #     pods = listar_pods(args.na)
+     #     pod = seleccionar_pod(pods)
+
+commit 511bb403e46813b5e8112979ff5ec317452c1c80
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 06:55:22 2025 -0500
+
+    feat(config): agregar archivo confi.ini con alias de comandos
+---
+ confi.ini | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/confi.ini b/confi.ini
+new file mode 100644
+index 0000000..0a5de6d
+--- /dev/null
++++ b/confi.ini
+@@ -0,0 +1,3 @@
++[aliases]
++ping_google = ping -c 4 google.com
++list_root = ls -la/
+\ No newline at end of file
+
+commit 082c562d2d78aea99c42495cc4a44ba71c04427c
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 06:55:59 2025 -0500
+
+    docs(README): Actualiza al finalizar Sprint 2
+---
+ README.md | 103 ++++++++++++++++++++++++++------------------------------------
+ 1 file changed, 43 insertions(+), 60 deletions(-)
+
+diff --git a/README.md b/README.md
+index ce54479..ba70d13 100644
+--- a/README.md
++++ b/README.md
+@@ -5,7 +5,9 @@
+ ```text
+ ├── CHANGELOG.md
+ ├── cli
+-│   └── container_exec.py
++│   ├── container_exec.py
++│   └── __init__.py
++├── config.ini
+ ├── deployment.yaml
+ ├── genera_changelog.py
+ ├── .githooks
+@@ -17,17 +19,34 @@
+ │       └── historia-de-usuario.md
+ ├── .gitignore
+ ├── README.md
++├── requirements.txt
+ ├── simple-app
+ │   └── Dockerfile
++├── tests
++│   ├── __init__.py
++│   └── test_container_exec.py
++├── validaciones-dockerfile
+ └── videos
+-    └── Sprint-1.mp4
+-```
++    ├── Sprint-1.mp4
++    └── Sprint-2.mp4
+ 
++```
+ 
+-## Sprint 2
+ 
+ ### Paso 0
+-Instalar Kubernetes y Minikube
++
++Para definir la carpeta que usara Git para lanzar los hooks:
++
++```sh
++$ git config core.hooksPath .githooks
++```
++
++Dar los permisos necesarios
++```sh
++$ chmod +x .githooks/commit-msg .githooks/post-commit .githooks/pre-commit
++```
++
++Instalar Docker, Kubernetes y Minikube
+ 
+ ### Paso 1
+ 
+@@ -56,15 +75,13 @@ Siempre asegurarse que Minikube este corriendo
+ ```sh
+ $ minikube status
+ 
+-# Debe salir:
++# Debe salir algo similar a:
+ host: Running
+ kubelet: Running
+ apiserver: Running
+ ```
+ 
+-Sino hay varias opciones:
+-
+-Iniciar nuevamente Minikube:
++Puedes tambien iniciar nuevamente Minikube:
+ 
+ ```sh
+ $ minikube start
+@@ -81,6 +98,18 @@ Asegurate que Minikube este corriendo exitosamente.
+ 
+ ### Paso 3
+ 
++Crear namespace
++
++```sh
++$ kubectl create namespace desarrollo
++```
++
++Validar namespaces
++
++```sh
++$ kubectl get namespaces
++```
++
+ Aplicar el manifiesto
+ 
+ ```sh
+@@ -119,6 +148,10 @@ Ejecutar en un contenedor Docker en modo docker
+ ```sh
+ python3 cli/container_exec.py --platform docker
+ ```
++Ejecutar en un pode de kubernetes en modo k8s y definiendo el namespace
++```sh
++python3 cli/container_exec.py --platform k8s --namespace desarrollo
++```
+ 
+ ### Paso 7
+ 
+@@ -126,54 +159,4 @@ Ejecutar pruebas unitarias
+ 
+ ```sh
+ pytest -v
+-```
+-
+-## Sprint 1
+-
+-### Estructura
+-
+-```text
+-├── CHANGELOG.md
+-├── genera_changelog.py
+-├── README.md
+-└── simple-app
+-    └── Dockerfile
+-```
+-
+-
+-### Paso 0
+-
+-Para definir la carpeta que usara Git para lanzar los hooks:
+-
+-```sh
+-git config core.hooksPath .githooks
+-```
+-
+-### Paso 1
+-
+-Descagar la imagen de DockerHub
+-
+-```sh
+-$ docker pull dirac22/simple-app:1.0.0
+-```
+-
+-Ejecutar el contenedor:
+-
+-```sh
+-$ docker run -it --name my-simple-app dirac22/simple-app:1.0.0
+-```
+-
+-Estando ahora en "el terminal del contenedor"
+-
+-Ejecutar ping (como ejemplo)
+-```sh
+-/# ping -c 4 google.com
+-```
+-
+-### Paso 2
+-Ejecutar el script:
+-```sh
+-python3 cli/container_exec.py
+-```
+-Se mostrara un listado numerado de contenedores activos.
+-Por ejemplo (ps, ps aux, ping, ls, ... etc)
+\ No newline at end of file
++```
+\ No newline at end of file
+
+commit c373b6304417f097fc4a1dbc2bd6572a001d2e19
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 06:57:43 2025 -0500
+
+    docs(video): Agrega video para Sprint 2
+---
+ videos/Sprint-2.mp4 | Bin 0 -> 72020639 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+diff --git a/videos/Sprint-2.mp4 b/videos/Sprint-2.mp4
+new file mode 100644
+index 0000000..f76c73b
+Binary files /dev/null and b/videos/Sprint-2.mp4 differ
+
+commit 2c8e4b029cd826ff5cfa508a1ef410c676e8402b
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 07:01:38 2025 -0500
+
+    test(container_exec): Ultimas modificaciones para Sprint 2
+---
+ tests/test_container_exec.py | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/tests/test_container_exec.py b/tests/test_container_exec.py
+index 2dd83c2..777ea84 100644
+--- a/tests/test_container_exec.py
++++ b/tests/test_container_exec.py
+@@ -17,7 +17,6 @@ def test_listar_contenedores_existentes(mocker):
+     resultado_mock = Mock()
+     resultado_mock.stdout = texto_simulado
+     mock_run = mocker.patch("cli.container_exec.subprocess.run", return_value=resultado_mock)
+-    mock_print = mocker.patch("builtins.print")
+ 
+     # Act
+     contenedores = listar_contenedores()
+@@ -38,7 +37,6 @@ def test_listar_contenedores_no_hay(mocker):
+     resultado_mock = Mock()
+     resultado_mock.stdout = ""
+     mocker.patch("cli.container_exec.subprocess.run", return_value=resultado_mock)
+-    mocker.patch("builtins.print")
+ 
+     # Act
+     with pytest.raises(SystemExit) as e:
+@@ -92,7 +90,7 @@ def test_ejecutar_comando_docker(mocker, comando):
+ 
+     # Act
+     ejecutar_comando_docker(id_contenedor, comando)
+-    comando_esperado = ["docker", "exec"] + [id_contenedor] + comando
++    # comando_esperado = ["docker", "exec"] + [id_contenedor] + comando
+     
+     # Assert
+     mock_run.assert_called_once_with(
+
+commit 84cee48bba9f05a2f4a7bf98a2cde56935384f59
+Merge: 070fb78 511bb40
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Mon Jun 30 07:08:28 2025 -0500
+
+    Merge pull request #19 from YoelMantari/feature/cli-docker-yoel
+    
+    Implementa sistema de adaptadores de comandos alias para la CLI
+
+commit b2c80eb6918aa02a77ee2a94385bd63a40431805
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 07:12:58 2025 -0500
+
+    chore(validaciones-dockerfile): Agrega para githook pre-commit
+---
+ .gitignore              | 7 ++++---
+ validaciones-dockerfile | 4 ++++
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 2e47f13..2907cea 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -8,9 +8,6 @@ PC4.md
+ # Recursos que se usaron en el proyecto
+ recursos
+ 
+-# Reglas minimas para archivos Dockerfile
+-validaciones-dockerfile
+-
+ # Otros
+ 
+ historial-comandos.*
+@@ -19,3 +16,7 @@ historial-comandos.*
+ **/__pycache__/
+ 
+ .coverage
++
++config.ini
++
++test_e2e.sh
+\ No newline at end of file
+diff --git a/validaciones-dockerfile b/validaciones-dockerfile
+new file mode 100644
+index 0000000..0840be7
+--- /dev/null
++++ b/validaciones-dockerfile
+@@ -0,0 +1,4 @@
++- Especifica la versión de la imagen base. 
++- Evitar FROM <imagen>:latest
++- El comando `apt-get update` se debe usar una sola vez para instalar las dependencias necesarias
++- La instrucción `COPY` debe estar después de la o las instrucciones `RUN`
+\ No newline at end of file
+
+commit 90c5fb145c4d13e2709a49be2075a2e935b49f96
+Merge: b2c80eb 84cee48
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 07:15:57 2025 -0500
+
+    Merge branch 'feature/cli-docker' into feature/cli-docker-mitchel
+
+commit d4b49da2d253803045e15db3c1f8bd3dc69228ce
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 07:49:16 2025 -0500
+
+    test(e2e): Se agrega script para ejecutar prueba E2E
+---
+ test_e2e.sh | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
+
+diff --git a/test_e2e.sh b/test_e2e.sh
+new file mode 100755
+index 0000000..860d9cd
+--- /dev/null
++++ b/test_e2e.sh
+@@ -0,0 +1,88 @@
++#!/bin/bash
++
++GREEN='\033[0;32m'
++RED='\033[0;31m'
++NC='\033[0m'
++
++DOCKER_CONTAINER_NAME="e2e-test-container"
++K8S_DEPLOYMENT_NAME="simple-app-deployment"
++TEST_IMAGE_NAME="e2e-test-app:latest"
++
++run_test() {
++    echo -n "Test: $1... "
++    output=$(eval "$2")
++    
++    if echo "$output" | grep -q "$3"; then
++        echo -e "${GREEN}Paso prueba${NC}"
++        return 0
++    else
++        echo -e "${RED}Fallo prueba${NC}"
++        echo "Salida obtenida: "
++        echo "$output"
++        echo " "
++        return 1
++    fi
++}
++
++echo "Iniciando configuraciones iniciales"
++
++echo "Limpiando recursos de pruebas anteriores..."
++docker rm -f $DOCKER_CONTAINER_NAME 2>/dev/null
++kubectl delete deployment $K8S_DEPLOYMENT_NAME 2>/dev/null
++
++echo "Construyendo la imagen de prueba: $TEST_IMAGE_NAME"
++docker build -t $TEST_IMAGE_NAME ./simple-app
++
++echo "Desplegando contenedor Docker de prueba: $DOCKER_CONTAINER_NAME"
++docker run -d --name $DOCKER_CONTAINER_NAME $TEST_IMAGE_NAME
++
++echo "Cargando imagen a Minikube..."
++minikube image load $TEST_IMAGE_NAME
++echo "Desplegando en Kubernetes..."
++kubectl apply -f deployment.yaml
++
++
++echo "Configuraciones iniciales completada"
++echo ""
++
++echo "Iniciando Pruebas E2E"
++failures=0
++
++run_test "Alias 'ping_google' en Docker" \
++         "echo -e '1\nping_google' | python3 cli/container_exec.py" \
++         "bytes of data" \
++         || failures=$((failures+1))
++
++run_test "Alias 'list_root' en Kubernetes" \
++         "echo -e '1\nlist_root' | python3 cli/container_exec.py -p k8s -n desarrollo" \
++         "etc" \
++         || failures=$((failures+1))
++
++run_test "Comando directo 'echo' en Docker" \
++         "echo -e '1\necho HELLO DOCKER' | python3 cli/container_exec.py" \
++         "HELLO DOCKER" \
++         || failures=$((failures+1))
++         
++run_test "Comando directo 'echo' en Kubernetes" \
++         "echo -e '1\necho HELLO K8S' | python3 cli/container_exec.py -p k8s -n desarrollo" \
++         "HELLO K8S" \
++         || failures=$((failures+1))
++
++echo ""
++
++
++echo "Iniciando fase de teardown (Limpieza de contenedores y pods)"
++echo "Limpiando recursos de prueba..."
++docker rm -f $DOCKER_CONTAINER_NAME
++kubectl delete deployment $K8S_DEPLOYMENT_NAME
++echo "--- Limpieza Completa ---"
++echo ""
++
++# --- 4. REPORTE FINAL ---
++if [ $failures -eq 0 ]; then
++    echo -e "${GREEN}¡Todas las pruebas E2E pasaron exitosamente!${NC}"
++    exit 0
++else
++    echo -e "${RED}$failures prueba(s) E2E fallaron.${NC}"
++    exit 1
++fi
+\ No newline at end of file
+
+commit e158e182b77948240b39172c365264a0edc21488
+Merge: 84cee48 90c5fb1
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Mon Jun 30 07:59:41 2025 -0500
+
+    Merge pull request #20 from YoelMantari/feature/cli-docker-mitchel
+    
+    Feature/cli docker mitchel
+
+commit 42f698d8966afa8c71ad0402e1f5d5bd163799f7
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 08:00:43 2025 -0500
+
+    refactor(ini): cambiar nombre del archivo .ini
+---
+ config.ini | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/config.ini b/config.ini
+new file mode 100644
+index 0000000..6e505de
+--- /dev/null
++++ b/config.ini
+@@ -0,0 +1,3 @@
++[aliases]
++ping_google = ping -c 4 google.com
++list_root = ls -la /
+\ No newline at end of file
+
+commit b0da8170059b44e4f7ae757abe975c91f47c2a69
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Mon Jun 30 08:01:50 2025 -0500
+
+    refactor(ini): eliminar confi.ini
+---
+ confi.ini | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/confi.ini b/confi.ini
+deleted file mode 100644
+index 0a5de6d..0000000
+--- a/confi.ini
++++ /dev/null
+@@ -1,3 +0,0 @@
+-[aliases]
+-ping_google = ping -c 4 google.com
+-list_root = ls -la/
+\ No newline at end of file
+
+commit bd8389a64c7896db25f1bce9ceeab58f281f100b
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 08:02:24 2025 -0500
+
+    test(E2E): Agrega script validado para pruebas E2E
+---
+ .gitignore      |  4 +---
+ CHANGELOG.md    | 21 ++++++++++++++++++++-
+ confi.ini       |  3 ---
+ deployment.yaml |  2 +-
+ test_e2e.sh     |  9 ++++-----
+ 5 files changed, 26 insertions(+), 13 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index e1424ac..3621445 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -17,6 +17,4 @@ historial-comandos.*
+ 
+ .coverage
+ 
+-config.ini
+-
+-test_e2e.sh
+\ No newline at end of file
++config.ini
+\ No newline at end of file
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 7867c18..3a5bbed 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -36,6 +36,7 @@
+ - **YoelMantari**: listar pods de kubernetes desde la cli. Commit: `2fd72dd`
+   - se añade la funcion listar_pods(), que imprime en forma enumerada los pods.
+ 
++<<<<<<< Updated upstream
+ - **YoelMantari**: mejorar seleccion de contenedor por id o nombre. Commit: `c27325a`
+   - se actualiza la funcion seleccionar_contenedor() para que se ingresar el id o nombre del contenedor en lugar de indice.
+ 
+@@ -50,4 +51,22 @@
+ 
+ 
+ 
+-- **Dirac**: Actualiza script para Sprint 2. Commit: `c98a4b5`
++## Dia 5
++
++- **YoelMantari**: se agrega soporte para carga de alias desde config.ini. Commit: `518c082`
++  - se implementa la funcion cargar_aliases() que permite leer alias definidos en un archivo ini. Commit: `feae786`
++
++- **YoelMantari**: se agrega soporte para carga de alias desde config.ini. Commit: `02ca192`
++
++- **YoelMantari**: permitir seleccion interactiva de pod por numero. Se agrega la funcion seleccionar_pod que solicita al usuario elegir un pod de una lista numerada. Commit: `f3d0fb9`
++
++- **YoelMantari**: ejecutar comandos en docker con soporte para alias. Commit: `0adf775`
++
++- **YoelMantari**: agregar soporte de alias en manejo de pods Kubernetes. Commit: `14f039d`
++
++- **YoelMantari**: integrar soporte de alias en funcion principal. Se modifica main() para cargar alias desde config.ini y pasarlos a las funciones de ejecucion.. Commit: `641ea92`
++
++- **YoelMantari**: agregar archivo confi.ini con alias de comandos. Commit: `511bb40`
++
++
++- **Dirac**: Se agrega script para ejecutar prueba E2E. Commit: `d4b49da`
+diff --git a/confi.ini b/confi.ini
+deleted file mode 100644
+index 0a5de6d..0000000
+--- a/confi.ini
++++ /dev/null
+@@ -1,3 +0,0 @@
+-[aliases]
+-ping_google = ping -c 4 google.com
+-list_root = ls -la/
+\ No newline at end of file
+diff --git a/deployment.yaml b/deployment.yaml
+index e83f7c4..21b94d4 100644
+--- a/deployment.yaml
++++ b/deployment.yaml
+@@ -4,7 +4,7 @@ kind: Deployment
+ 
+ metadata:
+   name: simple-app-deployment
+-  namespace: desarrollo
++  # namespace: desarrollo
+ 
+ spec:
+   replicas: 2
+diff --git a/test_e2e.sh b/test_e2e.sh
+index 860d9cd..57ddebf 100755
+--- a/test_e2e.sh
++++ b/test_e2e.sh
+@@ -54,7 +54,7 @@ run_test "Alias 'ping_google' en Docker" \
+          || failures=$((failures+1))
+ 
+ run_test "Alias 'list_root' en Kubernetes" \
+-         "echo -e '1\nlist_root' | python3 cli/container_exec.py -p k8s -n desarrollo" \
++         "echo -e '1\nlist_root' | python3 cli/container_exec.py -p k8s" \
+          "etc" \
+          || failures=$((failures+1))
+ 
+@@ -64,7 +64,7 @@ run_test "Comando directo 'echo' en Docker" \
+          || failures=$((failures+1))
+          
+ run_test "Comando directo 'echo' en Kubernetes" \
+-         "echo -e '1\necho HELLO K8S' | python3 cli/container_exec.py -p k8s -n desarrollo" \
++         "echo -e '1\necho HELLO K8S' | python3 cli/container_exec.py -p k8s" \
+          "HELLO K8S" \
+          || failures=$((failures+1))
+ 
+@@ -75,12 +75,11 @@ echo "Iniciando fase de teardown (Limpieza de contenedores y pods)"
+ echo "Limpiando recursos de prueba..."
+ docker rm -f $DOCKER_CONTAINER_NAME
+ kubectl delete deployment $K8S_DEPLOYMENT_NAME
+-echo "--- Limpieza Completa ---"
++echo "Limpieza Completa"
+ echo ""
+ 
+-# --- 4. REPORTE FINAL ---
+ if [ $failures -eq 0 ]; then
+-    echo -e "${GREEN}¡Todas las pruebas E2E pasaron exitosamente!${NC}"
++    echo -e "${GREEN}Todas las pruebas E2E pasaron exitosamente${NC}"
+     exit 0
+ else
+     echo -e "${RED}$failures prueba(s) E2E fallaron.${NC}"
+
+commit 8d67c349d3ad82936e8c4b64c99d2a481868c752
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 08:43:37 2025 -0500
+
+    docs(video): Se agrega video para Sprint 3
+---
+ videos/Sprint-3.mp4 | Bin 0 -> 50579901 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+diff --git a/videos/Sprint-3.mp4 b/videos/Sprint-3.mp4
+new file mode 100644
+index 0000000..578f95d
+Binary files /dev/null and b/videos/Sprint-3.mp4 differ
+
+commit 5154f5eb892522d22bd23ea9ec5b660d304c5688
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Mon Jun 30 09:22:39 2025 -0500
+
+    docs(video): Se agrega video de presentacion final
+---
+ videos/Video-final.mp4 | Bin 0 -> 38244369 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+diff --git a/videos/Video-final.mp4 b/videos/Video-final.mp4
+new file mode 100644
+index 0000000..21c614a
+Binary files /dev/null and b/videos/Video-final.mp4 differ
+
+commit 2d00822efa2cccfb459359810ffaf9e9e331b098
+Merge: e158e18 5154f5e
+Author: YoelMantari <smile_184@hotmail.com>
+Date:   Mon Jun 30 09:31:58 2025 -0500
+
+    Merge pull request #21 from YoelMantari/feature/cli-docker-mitchel
+    
+    Feature/cli docker mitchel
+
+commit 5ed2276284f03825ddb16914462f341c44e351a6
+Merge: e853511 2d00822
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Mon Jun 30 13:26:51 2025 -0500
+
+    Merge pull request #22 from YoelMantari/feature/cli-docker
+    
+    Merge final del sprint3: Adaptadores de comandos, pruebas E2E
+
+commit ee69446b465b061695520f649e853d834c50ae8a
+Merge: b0da817 5ed2276
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 06:11:35 2025 -0500
+
+    chore(main): resolviendo conflicto de merge con config.ini
+
+commit 758f198e68c39464a21e4b845f6bdba1b9ad36b1
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 08:33:34 2025 -0500
+
+    feat(ci): se agrega pipeline requerido
+---
+ .github/workflows/CI.yaml | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+new file mode 100644
+index 0000000..9919390
+--- /dev/null
++++ b/.github/workflows/CI.yaml
+@@ -0,0 +1,26 @@
++name: Adaptador
++
++# se ejecuta cuando se hace cada push a develop o feature
++on:
++  push:
++    branches:
++      - develop
++      - feature/*
++    pull_request:
++      branches:
++        - develop
++
++jobs:
++  build:
++    name: CI
++    runs-on: ubuntu-latest
++    steps:
++      - name: Checkout
++        uses: actions/checkout@v3
++
++      - name: construir imagen docker
++        run: |
++            docker build -t adaptador-ci:latest .
++      - name: kubernetes manifesto
++        run: |
++            kubectl apply --dry-run=client -f deployment.yaml
+
+commit 38831bebad9b1171b47d77d658ba910743bfc3f4
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 08:45:49 2025 -0500
+
+    feat(ci): se agrega pipeline requerido
+---
+ .github/workflows/CI.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index 9919390..f22aff2 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -9,7 +9,7 @@ on:
+     pull_request:
+       branches:
+         - develop
+-
++ 
+ jobs:
+   build:
+     name: CI
+
+commit 0dde0e15b8a77dd95a90abc6e24ada9bfcd8b7c8
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 08:47:15 2025 -0500
+
+    feat(ci): se agrega pipeline requerido
+---
+ .github/workflows/CI.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index f22aff2..fa8f1ea 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -24,3 +24,4 @@ jobs:
+       - name: kubernetes manifesto
+         run: |
+             kubectl apply --dry-run=client -f deployment.yaml
++ 
+\ No newline at end of file
+
+commit 70b6dd3d9bda68c1738d00b279cd7d020f26697e
+Merge: ee69446 0dde0e1
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Wed Jul 2 08:55:18 2025 -0500
+
+    Merge pull request #24 from YoelMantari/feature/Yoel/Adaotadires
+    
+    Ejecucion autentificada en docker y kubernetes
+
+commit ddb284d3d4627a22794e5065043d099a7d66893c
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 09:11:04 2025 -0500
+
+    fix(ci): corregir la ruta del dockerfile
+---
+ .github/workflows/CI.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index fa8f1ea..b7b7bf3 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -20,7 +20,7 @@ jobs:
+ 
+       - name: construir imagen docker
+         run: |
+-            docker build -t adaptador-ci:latest .
++            docker build -t adaptador-ci:latest ./simple-app
+       - name: kubernetes manifesto
+         run: |
+             kubectl apply --dry-run=client -f deployment.yaml
+
+commit ee9b02dc8d8da1fd96395fe3b8b0bc7f5f423008
+Merge: 70b6dd3 ddb284d
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Wed Jul 2 09:13:27 2025 -0500
+
+    Merge pull request #25 from YoelMantari/feature/Yoel/Adaotadires
+    
+    fix(ci): corregir la ruta del dockerfile
+
+commit bad00471adf7c97bf04c8163d84067b20142eb8e
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 09:29:26 2025 -0500
+
+    fix(ci): se instala kubectl y buildx
+---
+ .github/workflows/CI.yaml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index b7b7bf3..38ac53b 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -18,10 +18,18 @@ jobs:
+       - name: Checkout
+         uses: actions/checkout@v3
+ 
++      # construiccion de la imagen
+       - name: construir imagen docker
+         run: |
+             docker build -t adaptador-ci:latest ./simple-app
++
++      # instalacion de kubctl
+       - name: kubernetes manifesto
++        uses: actions/setup-kubectl@v3
++        with:
++          version: 'latest'
++
++      - name: desplegar kubectl
+         run: |
+             kubectl apply --dry-run=client -f deployment.yaml
+  
+\ No newline at end of file
+
+commit a2185cb6cceb1067701f4772fc87d31be7b03806
+Merge: ee9b02d bad0047
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Wed Jul 2 09:45:12 2025 -0500
+
+    Merge pull request #26 from YoelMantari/feature/Yoel/Adaotadires
+    
+    Correcion e instalacion del kubectl en el pipeline
+
+commit 6b787564ea6b3b36f29d06470823116dfa0071e9
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 17:02:45 2025 -0500
+
+    ci(workflow): agregar validacion jscpd, pytest, dry-run
+    
+    se agrega los pasos para validacion de la ejecucion de pruebas
+---
+ .github/workflows/CI.yaml | 61 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 49 insertions(+), 12 deletions(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index 38ac53b..5df907d 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -1,4 +1,4 @@
+-name: Adaptador
++name: CI
+ 
+ # se ejecuta cuando se hace cada push a develop o feature
+ on:
+@@ -6,9 +6,9 @@ on:
+     branches:
+       - develop
+       - feature/*
+-    pull_request:
+-      branches:
+-        - develop
++  pull_request:
++    branches:
++      - develop
+  
+ jobs:
+   build:
+@@ -18,18 +18,55 @@ jobs:
+       - name: Checkout
+         uses: actions/checkout@v3
+ 
++      # detectar duplicación con jscpd
++      - name: Instalar Node.js y jscpd
++        uses: actions/setup-node@v3
++        with:
++          node-version: '18'
++      - name: Ejecutar jscpd
++        run: |
++          npm install -g jscpd
++          jscpd --threshold 30 . || exit 1
++
++      # ejecutar pytest
++      - name: Configurar Python y dependencias
++        uses: actions/setup-python@v4
++        with:
++          python-version: '3.x'
++      - name: Instalar requisitos y pytest
++        run: |
++          pip install --upgrade pip
++          pip install -r requirements.txt pytest pytest-mock
++      - name: Ejecutar pruebas
++        run: pytest --maxfail=1 --disable-warnings -q
++
++      # lint de scripts 
++      - name: Instalar shellcheck
++        run: sudo apt-get update && sudo apt-get install -y shellcheck
++      - name: Lintear scripts .sh
++        run: find . -name '*.sh' -print0 | xargs -0 shellcheck
++
++      # descarga y validar manifiestos k8s
++      - name: Instalar kubeconform
++        run: |
++          curl -sSL -o kubeconform.tar.gz \
++            https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
++          tar -zxvf kubeconform.tar.gz
++          sudo mv kubeconform /usr/local/bin/
++      - name: Validar manifiesto K8s
++        run: kubeconform -strict -summary deployment.yaml
++
+       # construiccion de la imagen
+       - name: construir imagen docker
+-        run: |
+-            docker build -t adaptador-ci:latest ./simple-app
++        run: docker build -t adaptador-ci:latest ./simple-app
+ 
+-      # instalacion de kubctl
+-      - name: kubernetes manifesto
+-        uses: actions/setup-kubectl@v3
++      # instalacion de kubctl para validacion
++      - name: Instalar kubectl
++        uses: azure/setup-kubectl@v3
+         with:
+           version: 'latest'
+ 
+-      - name: desplegar kubectl
+-        run: |
+-            kubectl apply --dry-run=client -f deployment.yaml
++      # verificar la validez del manifiesto
++      - name: validar k8s con dry-run
++        run: kubectl apply --dry-run=client -f deployment.yaml
+  
+\ No newline at end of file
+
+commit 6cea8175c00ce0ad18b92e2e84a034c20d5aef6f
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 17:14:40 2025 -0500
+
+    ci(workflow): desactivar validacion contra api server en dry-run
+---
+ .github/workflows/CI.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index 5df907d..025453e 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -68,5 +68,5 @@ jobs:
+ 
+       # verificar la validez del manifiesto
+       - name: validar k8s con dry-run
+-        run: kubectl apply --dry-run=client -f deployment.yaml
++        run: kubectl apply --dry-run=client --validate=false -f deployment.yaml
+  
+\ No newline at end of file
+
+commit 824158ff1181191d243ec1decc37adca70fe5a9b
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 17:26:16 2025 -0500
+
+    ci(workflow): agregar escaneo anti llm
+---
+ .github/workflows/CI.yaml | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index 025453e..c146da2 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -11,6 +11,18 @@ on:
+       - develop
+  
+ jobs:
++  # escaneo de llm
++  token-scan:
++    name: Escaneo de llm
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v3
++      - name: buscara cadenas asociadas a AI
++        run: |
++          grep -RIE --exclude-dir=.git \
++            -e "chatgpt" -e "bard" -e "llama" -e "as an ai" \
++            -e "🧩" -e "🧠" -e "✅" -e "🧪" . && exit 1 || exit 0
++
+   build:
+     name: CI
+     runs-on: ubuntu-latest
+@@ -59,14 +71,3 @@ jobs:
+       # construiccion de la imagen
+       - name: construir imagen docker
+         run: docker build -t adaptador-ci:latest ./simple-app
+-
+-      # instalacion de kubctl para validacion
+-      - name: Instalar kubectl
+-        uses: azure/setup-kubectl@v3
+-        with:
+-          version: 'latest'
+-
+-      # verificar la validez del manifiesto
+-      - name: validar k8s con dry-run
+-        run: kubectl apply --dry-run=client --validate=false -f deployment.yaml
+- 
+\ No newline at end of file
+
+commit 0efb0a94a9b122e502134c071e8c233ce58c4b1e
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 17:29:14 2025 -0500
+
+    ci(workflow): excluir .github/workflows del escaneo antillm
+---
+ .github/workflows/CI.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index c146da2..466d91a 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -19,7 +19,7 @@ jobs:
+       - uses: actions/checkout@v3
+       - name: buscara cadenas asociadas a AI
+         run: |
+-          grep -RIE --exclude-dir=.git \
++          grep -RIE --exclude-dir=.git --exclude-dir=.github/workflows \
+             -e "chatgpt" -e "bard" -e "llama" -e "as an ai" \
+             -e "🧩" -e "🧠" -e "✅" -e "🧪" . && exit 1 || exit 0
+ 
+
+commit de99ac16a602f4fff350ee88c853a9d5ef7b4da8
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 17:32:37 2025 -0500
+
+    ci(workflow): ajustes en configuración del pipeline
+---
+ .github/workflows/CI.yaml | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index 466d91a..7d0483f 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -11,18 +11,6 @@ on:
+       - develop
+  
+ jobs:
+-  # escaneo de llm
+-  token-scan:
+-    name: Escaneo de llm
+-    runs-on: ubuntu-latest
+-    steps:
+-      - uses: actions/checkout@v3
+-      - name: buscara cadenas asociadas a AI
+-        run: |
+-          grep -RIE --exclude-dir=.git --exclude-dir=.github/workflows \
+-            -e "chatgpt" -e "bard" -e "llama" -e "as an ai" \
+-            -e "🧩" -e "🧠" -e "✅" -e "🧪" . && exit 1 || exit 0
+-
+   build:
+     name: CI
+     runs-on: ubuntu-latest
+
+commit a5e260aeaf61ec00cd6ba7054b1c44003236bd8f
+Merge: a2185cb de99ac1
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Wed Jul 2 17:43:21 2025 -0500
+
+    Merge pull request #27 from YoelMantari/feature/Yoel/CI-permisos
+    
+    Agregar pipeline CI/CD
+
+commit 49e1c0cbfdb2659d808676870b3da41271157ef3
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 19:28:49 2025 -0500
+
+    ci(workflow): integrar escaneo anti-plagio en CI
+---
+ .github/workflows/CI.yaml | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index 7d0483f..e0c877b 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -18,6 +18,23 @@ jobs:
+       - name: Checkout
+         uses: actions/checkout@v3
+ 
++      # escaneo para uso de anti plageo
++      - name: Escaneo anti-plagio
++        run: |
++          grep -RIE \
++            --exclude-dir=.git \
++            --exclude-dir=.github \
++            --exclude='CI.yaml' \
++            -e "chatgpt" \
++            -e "bard" \
++            -e "llama" \
++            -e "as an ai" \
++            -e "🧩" \
++            -e "🧠" \
++            -e "✅" \
++            -e "🧪" \
++            . && exit 1 || exit 0
++
+       # detectar duplicación con jscpd
+       - name: Instalar Node.js y jscpd
+         uses: actions/setup-node@v3
+
+commit c6531d22c98b418f733da551f9553fcb442929d3
+Merge: a5e260a 49e1c0c
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Wed Jul 2 20:33:16 2025 -0500
+
+    Merge pull request #28 from YoelMantari/feature/Yoel/CI-permisos
+    
+    ci(workflow): agregar escaneo anti-plagio al pipeline CI
+
+commit ea1b2b338e710997026dea8f65ee2c59192703c0
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 22:50:44 2025 -0500
+
+    ci(rbac): se define Service Account y permisos para exec en pods
+---
+ rbac.yaml | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/rbac.yaml b/rbac.yaml
+new file mode 100644
+index 0000000..05d46ab
+--- /dev/null
++++ b/rbac.yaml
+@@ -0,0 +1,32 @@
++# se define una cuenta llamada 'exec-user'
++apiVersion: v1
++kind: ServiceAccount
++metadata:
++  name: exec-user
++  namespace: default
++---
++# se define un rol llamado 'exec-role'
++apiVersion: rbac.authorization.k8s.io/v1
++kind: Role
++metadata:
++  namespace: default
++  name: exec-role
++rules:
++- apiGroups: [""]
++  resources: ["pods", "pods/exec"]
++  verbs: ["get", "list", "create", "delete", "patch"]
++---
++# se vincula la cuenta de servicio 'exec-user' con el rol 'exec-role'
++apiVersion: rbac.authorization.k8s.io/v1
++kind: RoleBinding
++metadata:
++  name: exec-binding
++  namespace: default
++subjects:
++- kind: ServiceAccount
++  name: exec-user
++  namespace: default
++roleRef:
++  kind: Role
++  name: exec-role
++  apiGroup: rbac.authorization.k8s.io
+
+commit 7c66b3776a63fcf1b424604e6da26e8a5da3616c
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Wed Jul 2 22:58:21 2025 -0500
+
+    docs(README): Actualiza para PC5
+---
+ README.md | 483 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 482 insertions(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index ba70d13..28566ef 100644
+--- a/README.md
++++ b/README.md
+@@ -159,4 +159,485 @@ Ejecutar pruebas unitarias
+ 
+ ```sh
+ pytest -v
+-```
+\ No newline at end of file
++```
++
++---
++
++### Autenticación de usuarios en contenedores
++
++Construir la imagen
++
++```sh
++docker build -t dirac/simple-app:1.6.0 ./simple-app
++```
++
++Correr un contenedor a partir de la imagen:
++
++```sh
++docker run -d --name contenedor-usuario dirac22/simple-app:latest
++```
++
++Para ejecutar comandos dentro del contenedor y ver el usuario:
++
++```sh
++docker exec -it contenedor-usuario sh
++```
++
++Dentro podemos escribir
++
++```sh
++whoami
++```
++
++Y nos saldrá el usuario `dirac`. Si por ejemplo queremos crear un archivo en una carpeta restringida como `/etc`
++
++```sh
++touch etc/test.txt
++```
++
++Saldrá permiso denegado.
++
++
++### **TLS** y conexiones seguras
++
++Crear el directorio de trabajo
++
++```sh
++$ mkdir -p ~/docker-tls
++$ ~/docker-tls
++```
++
++#### Crear la CA 
++Creamos la Autoridad certificadora, aquí vamos a generar una clave privada RSA de 4096 bits cifrada mediante AES-256 longitud de 256
++  
++
++```sh
++$ openssl genrsa -aes256 -out ca-key.pem 4096
++```
++
++Crear certificado publico para la CA
++Creamos un certificado auto firmado valido para un año. Este certificado será usado para firmar certificados del servidor y del cliente.
++
++```sh
++$ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem
++```
++
++#### Generar certificado para el servidor
++
++```sh
++$ openssl genrsa -out server-key.pem 4096
++```
++  
++
++Crear CSR `hostname=127.0.0.1`
++Creamos una CSR (Solicitud de firma de Certificado) he indico la IP de mi máquina virtual Ubuntu. Esta IP es la que será accedida por mi maquina host que hará de cliente remoto.
++
++```sh
++$ openssl req -subj "/CN=192.168.81.9" -sha256 -new -key server-key.pem -out server.csr
++```
++
++Especificar extensiones
++Aquí especificamos para qué IP es válido el certificado. Y declaramos que el certificado será usado por el servidor.
++
++```sh
++$ echo subjectAltName = IP:192.168.81.9 > extfile.cnf
++$ echo extendedKeyUsage = serverAuth >> extfile.cnf
++```
++
++  
++Firmar el certificado
++Aquí se firma la solicitud `server.csr` usando la CA para emitir el certificado final del servidor.
++  
++```sh
++
++$ openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem \
++-CAcreateserial -out server-cert.pem -extfile extfile.cnf
++```
++  
++#### Generar el certificado para el cliente
++
++  
++Algo similar para el certificado para el cliente. En nuestro caso será mi maquina host Windows.
++
++- Genero una clave privada de 4096 bit para el cliente usando RSA
++- Creamos una CSR para el cliente
++- Indicamos que este certificado se usará para la autenticación del cliente.
++
++```sh
++$ openssl genrsa -out key.pem 4096
++$ openssl req -subj '/CN=client' -new -key key.pem -out client.csr
++$ echo extendedKeyUsage = clientAuth > extfile-client.cnf
++
++```
++
++  Se firma la CSR del cliente
++
++```sh
++$ openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem \
++-CAcreateserial -out cert.pem -extfile extfile-client.cnf
++```
++
++#### Proteger los archivos
++
++- Solo lectura para el propietario
++- Solo lectura para todos
++
++```sh
++$ chmod 0400 ca-key.pem key.pem server-key.pem
++$ chmod 0444 ca.pem server-cert.pem cert.pem
++```
++
++  
++#### Iniciar Docker con TLS
++
++Detenemos el servicio docker
++
++```sh
++sudo systemctl stop docker
++```
++
++  Iniciamos el daemon Docker de forma manual:
++
++```sh
++sudo dockerd \
++--tlsverify \
++--tlscacert=ca.pem \
++--tlscert=server-cert.pem \
++--tlskey=server-key.pem \
++-H=0.0.0.0:2376
++```
++
++#### En la maquina cliente remota
++  
++
++```sh
++$ docker --tlsverify \
++--tlscacert=ca.pem \
++--tlscert=cert.pem \
++--tlskey=key.pem \
++-H=tcp://192.168.81.9:2376 version
++```
++
++  
++
++```sh
++$ export DOCKER_HOST=tcp://192.168.81.9:2376
++$ export DOCKER_TLS_VERIFY=1 
++
++# En mi Windows:
++$ export DOCKER_CERT_PATH="C:\Users\mitch\Documents\docker-tls"
++```
++
++#### Prueba en maquina cliente Windows
++
++```sh
++$ docker ps
++$ docker ps -a
++```
++
++### **TLS** y conexiones seguras
++
++Crear el directorio de trabajo
++
++```sh
++$ mkdir -p ~/docker-tls
++$ ~/docker-tls
++```
++
++#### Crear la CA 
++Creamos la Autoridad certificadora, aquí vamos a generar una clave privada RSA de 4096 bits cifrada mediante AES-256 longitud de 256
++  
++
++```sh
++$ openssl genrsa -aes256 -out ca-key.pem 4096
++```
++
++Crear certificado publico para la CA
++Creamos un certificado auto firmado valido para un año. Este certificado será usado para firmar certificados del servidor y del cliente.
++
++```sh
++$ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem
++```
++
++#### Generar certificado para el servidor
++
++```sh
++$ openssl genrsa -out server-key.pem 4096
++```
++  
++
++Crear CSR `hostname=127.0.0.1`
++Creamos una CSR (Solicitud de firma de Certificado) he indico la IP de mi máquina virtual Ubuntu. Esta IP es la que será accedida por mi maquina host que hará de cliente remoto.
++
++```sh
++$ openssl req -subj "/CN=192.168.81.9" -sha256 -new -key server-key.pem -out server.csr
++```
++
++Especificar extensiones
++Aquí especificamos para qué IP es válido el certificado. Y declaramos que el certificado será usado por el servidor.
++
++```sh
++$ echo subjectAltName = IP:192.168.81.9 > extfile.cnf
++$ echo extendedKeyUsage = serverAuth >> extfile.cnf
++```
++
++  
++Firmar el certificado
++Aquí se firma la solicitud `server.csr` usando la CA para emitir el certificado final del servidor.
++  
++```sh
++
++$ openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem \
++-CAcreateserial -out server-cert.pem -extfile extfile.cnf
++```
++  
++#### Generar el certificado para el cliente
++
++  
++Algo similar para el certificado para el cliente. En nuestro caso será mi maquina host Windows.
++
++- Genero una clave privada de 4096 bit para el cliente usando RSA
++- Creamos una CSR para el cliente
++- Indicamos que este certificado se usará para la autenticación del cliente.
++
++```sh
++$ openssl genrsa -out key.pem 4096
++$ openssl req -subj '/CN=client' -new -key key.pem -out client.csr
++$ echo extendedKeyUsage = clientAuth > extfile-client.cnf
++
++```
++
++  Se firma la CSR del cliente
++
++```sh
++$ openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem \
++-CAcreateserial -out cert.pem -extfile extfile-client.cnf
++```
++
++#### Proteger los archivos
++
++- Solo lectura para el propietario
++- Solo lectura para todos
++
++```sh
++$ chmod 0400 ca-key.pem key.pem server-key.pem
++$ chmod 0444 ca.pem server-cert.pem cert.pem
++```
++
++  
++#### Iniciar Docker con TLS
++
++Detenemos el servicio docker
++
++```sh
++sudo systemctl stop docker
++```
++
++  Iniciamos el daemon Docker de forma manual:
++
++```sh
++sudo dockerd \
++--tlsverify \
++--tlscacert=ca.pem \
++--tlscert=server-cert.pem \
++--tlskey=server-key.pem \
++-H=0.0.0.0:2376
++```
++
++#### En la maquina cliente remota
++  
++
++```sh
++$ docker --tlsverify \
++--tlscacert=ca.pem \
++--tlscert=cert.pem \
++--tlskey=key.pem \
++-H=tcp://192.168.81.9:2376 version
++```
++
++  
++
++```sh
++$ export DOCKER_HOST=tcp://192.168.81.9:2376
++$ export DOCKER_TLS_VERIFY=1 
++
++# En mi Windows:
++$ export DOCKER_CERT_PATH="C:\Users\mitch\Documents\docker-tls"
++```
++
++#### Prueba en maquina cliente Windows
++
++```sh
++$ docker ps
++$ docker ps -a
++```
++
++### **TLS** y conexiones seguras
++
++Crear el directorio de trabajo
++
++```sh
++$ mkdir -p ~/docker-tls
++$ ~/docker-tls
++```
++
++#### Crear la CA 
++Creamos la Autoridad certificadora, aquí vamos a generar una clave privada RSA de 4096 bits cifrada mediante AES-256 longitud de 256
++
++```sh
++$ openssl genrsa -aes256 -out ca-key.pem 4096
++```
++
++Creamos un certificado auto firmado valido para un año. Este certificado será usado para firmar certificados del servidor y del cliente.
++
++```sh
++$ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem
++```
++
++#### Generar certificado para el servidor
++
++```sh
++$ openssl genrsa -out server-key.pem 4096
++```
++  
++Creamos una CSR (Solicitud de firma de Certificado) he indico la IP de mi máquina virtual Ubuntu. Esta IP es la que será accedida por mi maquina host que hará de cliente remoto.
++
++```sh
++$ openssl req -subj "/CN=192.168.81.9" -sha256 -new -key server-key.pem -out server.csr
++```
++
++Aquí especificamos para qué IP es válido el certificado. Y declaramos que el certificado será usado por el servidor.
++
++```sh
++$ echo subjectAltName = IP:192.168.81.9 > extfile.cnf
++$ echo extendedKeyUsage = serverAuth >> extfile.cnf
++```
++
++
++Aquí se firma la solicitud `server.csr` usando la CA para emitir el certificado final del servidor.
++  
++```sh
++
++$ openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem \
++-CAcreateserial -out server-cert.pem -extfile extfile.cnf
++```
++  
++#### Generar el certificado para el cliente
++
++  
++Algo similar para el certificado para el cliente. En nuestro caso será mi maquina host Windows.
++
++- Genero una clave privada de 4096 bit para el cliente usando RSA
++- Creamos una CSR para el cliente
++- Indicamos que este certificado se usará para la autenticación del cliente.
++
++```sh
++$ openssl genrsa -out key.pem 4096
++$ openssl req -subj '/CN=client' -new -key key.pem -out client.csr
++$ echo extendedKeyUsage = clientAuth > extfile-client.cnf
++```
++
++Se firma la CSR del cliente
++
++```sh
++$ openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem \
++-CAcreateserial -out cert.pem -extfile extfile-client.cnf
++```
++
++#### Proteger los archivos
++
++- Solo lectura para el propietario
++- Solo lectura para todos
++
++```sh
++$ chmod 0400 ca-key.pem key.pem server-key.pem
++$ chmod 0444 ca.pem server-cert.pem cert.pem
++```
++
++  
++#### Iniciar Docker con TLS
++
++Detenemos el servicio docker
++
++```sh
++sudo systemctl stop docker
++```
++
++Iniciamos el daemon Docker de forma manual:
++
++```sh
++sudo dockerd \
++--tlsverify \
++--tlscacert=ca.pem \
++--tlscert=server-cert.pem \
++--tlskey=server-key.pem \
++-H=0.0.0.0:2376
++```
++
++#### En la maquina cliente remota
++  
++
++```sh
++$ docker --tlsverify \
++--tlscacert=ca.pem \
++--tlscert=cert.pem \
++--tlskey=key.pem \
++-H=tcp://192.168.81.9:2376 version
++```
++
++```sh
++$ export DOCKER_HOST=tcp://192.168.81.9:2376
++$ export DOCKER_TLS_VERIFY=1 
++# En mi Windows:
++$ export DOCKER_CERT_PATH="C:\Users\mitch\Documents\docker-tls"
++```
++
++#### Prueba en maquina cliente Windows
++
++```sh
++$ docker ps
++$ docker ps -a
++```
++
++
++
++
++### *Aplicar el manifiesto y validar*
++
++Ahora aplico el archivo:
++
++bash
++kubectl apply -f rbac.yaml
++
++
++> Esto crea el usuario, el rol y el binding en Kubernetes.
++
++Verificamos que el usuario se haya creado:
++
++bash
++kubectl get serviceaccounts
++
++
++Verificamos que el rol exista:
++
++bash
++kubectl get role exec-role
++
++
++Verificamos el binding:
++
++bash
++kubectl get rolebinding exec-binding
++
++
++---
++
++### *Validación final del acceso*
++
++Validamos si el usuario tiene permiso para ejecutar comandos en pods:
++
++bash
++kubectl auth can-i create pods/exec --as=system:serviceaccount:default:exec-user
++
++
++> Si el resultado es yes, significa que nuestro RBAC fue aplicado correctamente.
+\ No newline at end of file
+
+commit b2dab923f52ca65c0d54e0289c8c781818843962
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Wed Jul 2 23:01:18 2025 -0500
+
+    feat(CLI): Actualiza para logs locales
+---
+ cli/container_exec.py | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/cli/container_exec.py b/cli/container_exec.py
+index 158a36c..3f248cb 100644
+--- a/cli/container_exec.py
++++ b/cli/container_exec.py
+@@ -2,7 +2,12 @@ import subprocess
+ import sys
+ import argparse
+ import configparser
++import logging
++from pathlib import Path
+ 
++log_path = Path('logs-centralizado.log')
++
++logging.basicConfig(filename=log_path, encoding='utf-8', level=logging.DEBUG)
+ 
+ def cargar_aliases(config_file="config.ini") -> dict:
+     """
+@@ -28,6 +33,11 @@ def listar_contenedores() -> list[str]:
+     if not contenedores or contenedores == ['']:
+         print("No hay contenedores en ejecucion.")
+         sys.exit(0)
++    logging.info("Listnado contenedores")
++    if resultado.stdout:
++        logging.debug(f"Salida:\n{resultado.stdout}")
++    if resultado.stderr:
++        logging.error(f"Salida:\n{resultado.stderr}")
+     return contenedores
+     # print("\nContenedores activos:")
+     # for i, cont in enumerate(contenedores):
+@@ -43,11 +53,19 @@ def listar_pods(namespace: str | None) -> list[str]:
+     comando = ["kubectl", "get", "pods", "-o", "custom-columns=NAME:.metadata.name"]
+     if namespace:
+         comando.extend(["-n", namespace])
+-    resultado = subprocess.run(comando, stdout=subprocess.PIPE, text=True, check=True)
++    resultado = subprocess.run(comando, 
++                               stdout=subprocess.PIPE, 
++                               stderr=subprocess.PIPE, 
++                               text=True, check=True)
+     pods = resultado.stdout.strip().splitlines()[1:]
+     if not pods:
+         print("No hay pods en el namespace actual.")
+         sys.exit(0)
++    logging.info("Listnado pods")
++    if resultado.stdout:
++        logging.debug(f"Salida:\n{resultado.stdout}")
++    if resultado.stderr:
++        logging.error(f"Salida:\n{resultado.stderr}")
+     # print("\nPods Kubernetes activos:")
+     # for i, pod in enumerate(pods, 1):
+     #     print(f"{i}. {pod}")
+@@ -70,6 +88,11 @@ def ejecutar_comando_docker(contenedor_id: str, comando: list[str]) -> None:
+     print(resultado.stdout)
+     print("Errores:")
+     print(resultado.stderr)
++    logging.info("Ejecutando comando dentro de Contendor")
++    if resultado.stdout:
++        logging.debug(f"Salida:\n{resultado.stdout}")
++    if resultado.stderr:
++        logging.error(f"Error:\n{resultado.stderr}")
+ 
+ 
+ def seleccionar_pod(pods: list[str]) -> str:
+@@ -84,6 +107,7 @@ def seleccionar_pod(pods: list[str]) -> str:
+             if 0 <= idx < len(pods):
+                 return pods[idx]
+         print(f"'{entrada}' no es un numero valido, intentarlo de nuevo")
++    
+ 
+ 
+ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) -> None:
+@@ -96,7 +120,17 @@ def ejecutar_comando_k8s(pod: str, namespace: str | None, comando: list[str]) ->
+         cmd_base.extend(["-n", namespace])
+     flags = ["-i", "-t"] if comando and comando[0] in ("bash", "sh") else []
+     cmd = cmd_base + flags + [pod, "--"] + comando
+-    subprocess.run(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
++    resultado = subprocess.run(
++        cmd, 
++        stdin=sys.stdin, 
++        stdout=subprocess.PIPE, 
++        stderr=subprocess.PIPE,
++        text=True)
++    logging.info("Ejecutando comando dentro de pod")
++    if resultado.stdout:
++        logging.debug(f"Salida:\n{resultado.stdout}")
++    if resultado.stderr:
++        logging.error(f"Error:\n{resultado.stderr}")
+ 
+ 
+ def seleccionar_recurso(recursos: list[str], tipo_recurso: str) -> str:
+
+commit 534c9833f6a226e54499f5c15528fc40da6b515e
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Wed Jul 2 23:01:54 2025 -0500
+
+    feat(Dockerfile): Actualiza para incluir usuario
+---
+ simple-app/Dockerfile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/simple-app/Dockerfile b/simple-app/Dockerfile
+index a160788..ecffdb5 100644
+--- a/simple-app/Dockerfile
++++ b/simple-app/Dockerfile
+@@ -1,5 +1,6 @@
+ FROM ubuntu:22.04
+ 
+ RUN apt-get update && apt-get install -y iputils-ping
+-
++RUN adduser -ms /bin/bash dirac
++USER dirac
+ CMD ["tail", "-f", "/dev/null"]
+\ No newline at end of file
+
+commit 2226374bfdde859546a6e62774a478aba278b0e2
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Wed Jul 2 23:02:55 2025 -0500
+
+    chore(logs): Agrega archivo centralizado de logs
+---
+ logs-centralizado.log | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
+
+diff --git a/logs-centralizado.log b/logs-centralizado.log
+new file mode 100644
+index 0000000..4a653da
+--- /dev/null
++++ b/logs-centralizado.log
+@@ -0,0 +1,59 @@
++INFO:root:Listnado contenedores
++DEBUG:root:Salida:
++c8dbc599394f: gcr.io/k8s-minikube/kicbase:v0.0.47 - minikube
++f4c3b9a4ad0a: dirac22/simple-app:1.1.0 - simple-app4
++ac34cddfaedc: dirac22/simple-app:1.1.0 - simple-app3
++
++INFO:root:Ejecutando comando dentro de Contendor
++DEBUG:root:Salida:
++PING google.com (172.217.192.100) 56(84) bytes of data.
++64 bytes from cf-in-f100.1e100.net (172.217.192.100): icmp_seq=1 ttl=254 time=47.1 ms
++64 bytes from cf-in-f100.1e100.net (172.217.192.100): icmp_seq=2 ttl=254 time=42.6 ms
++64 bytes from cf-in-f100.1e100.net (172.217.192.100): icmp_seq=3 ttl=254 time=50.4 ms
++64 bytes from cf-in-f100.1e100.net (172.217.192.100): icmp_seq=4 ttl=254 time=43.6 ms
++
++--- google.com ping statistics ---
++4 packets transmitted, 4 received, 0% packet loss, time 3008ms
++rtt min/avg/max/mdev = 42.640/45.932/50.418/3.069 ms
++
++INFO:root:Listnado pods
++DEBUG:root:Salida:
++NAME
++simple-app-deployment-65958fd787-vfgwx
++simple-app-deployment-65958fd787-x84h9
++
++INFO:root:Ejecutando comando dentro de pod
++DEBUG:root:Salida:
++bin
++boot
++dev
++etc
++home
++lib
++lib32
++lib64
++libx32
++media
++mnt
++opt
++proc
++root
++run
++sbin
++srv
++sys
++tmp
++usr
++var
++
++INFO:root:Listnado pods
++DEBUG:root:Salida:
++NAME
++simple-app-deployment-65958fd787-vfgwx
++simple-app-deployment-65958fd787-x84h9
++
++INFO:root:Ejecutando comando dentro de pod
++ERROR:root:Error:
++touch: cannot touch '/erfre/rerve': No such file or directory
++command terminated with exit code 1
++
+
+commit 28ee42f54a87e1a40108292ac06406f21b3bbbde
+Author: YoelMantari <yoel.mantari.s@uni.pe>
+Date:   Wed Jul 2 23:03:29 2025 -0500
+
+    fix(ci): eliminar el Grep
+---
+ .github/workflows/CI.yaml | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+diff --git a/.github/workflows/CI.yaml b/.github/workflows/CI.yaml
+index e0c877b..7d0483f 100644
+--- a/.github/workflows/CI.yaml
++++ b/.github/workflows/CI.yaml
+@@ -18,23 +18,6 @@ jobs:
+       - name: Checkout
+         uses: actions/checkout@v3
+ 
+-      # escaneo para uso de anti plageo
+-      - name: Escaneo anti-plagio
+-        run: |
+-          grep -RIE \
+-            --exclude-dir=.git \
+-            --exclude-dir=.github \
+-            --exclude='CI.yaml' \
+-            -e "chatgpt" \
+-            -e "bard" \
+-            -e "llama" \
+-            -e "as an ai" \
+-            -e "🧩" \
+-            -e "🧠" \
+-            -e "✅" \
+-            -e "🧪" \
+-            . && exit 1 || exit 0
+-
+       # detectar duplicación con jscpd
+       - name: Instalar Node.js y jscpd
+         uses: actions/setup-node@v3
+
+commit 16d3878686553c7622627a78918728b8a9ae5d48
+Merge: c6531d2 28ee42f
+Author: Dirac <109837740+Dirac2022@users.noreply.github.com>
+Date:   Wed Jul 2 23:06:00 2025 -0500
+
+    Merge pull request #29 from YoelMantari/feature/Yoel/CI-permisos
+    
+    Se defube ServuceAccoun y permisos para exec en pods
+
+commit 8971422449c924abd37bc0183f5e9e6c87aaaa3d
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Wed Jul 2 23:26:28 2025 -0500
+
+    docs(README): Incluye link de video para PC5
+---
+ README.md | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/README.md b/README.md
+index 28566ef..f9fd3c9 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,9 @@
+ # Adaptador--comandos-contenedores
+ 
++**Video para la PC5:**
++
++https://youtu.be/OaViE2hYSiU
++
+ ### Estructura
+ 
+ ```text
+
+commit 774208f8bbd5993523fc32021759fba5ec8af8d6
+Merge: 8971422 16d3878
+Author: Dirac <daronmitchel@gmail.com>
+Date:   Wed Jul 2 23:28:18 2025 -0500
+
+    feat(merge): 'develop' into feature/cli-docker-mitchel
